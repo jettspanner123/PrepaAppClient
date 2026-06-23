@@ -29,6 +29,8 @@ export default class OnboardingScreenCON {
             description: "Your exam date and study start date.",
         },
     ];
+
+    // ─── Basic Information View ───────────────────────────────────────
     public static readonly BASIC_INFO_TITLE: string = "Basic Information";
     public static readonly BASIC_INFO_SUBTITLE: string =
         "Tell us a bit about yourself. We'll use this information for your custom profile.";
@@ -42,4 +44,17 @@ export default class OnboardingScreenCON {
     public static readonly LABEL_PROFILE_NAME: string = "Profile Name";
     public static readonly PLACEHOLDER_PROFILE_NAME: string =
         "e.g. My Study Profile";
+
+    // ─── Course Information View ──────────────────────────────────────
+    public static readonly COURSE_INFO_TITLE: string = "Course\nInformation";
+    public static readonly COURSE_INFO_SUBTITLE: string =
+        "Tell us what you're preparing for.\nWe'll tailor your experience around it.";
+
+    public static readonly LABEL_STUDYING_FOR: string =
+        "What are you studying for";
+    public static readonly PLACEHOLDER_STUDYING_FOR: string =
+        "e.g. CAT 2025, GMAT, GRE";
+
+    public static readonly LABEL_ATTEMPT_YEAR: string =
+        "Which year will you be attempting?";
 }
