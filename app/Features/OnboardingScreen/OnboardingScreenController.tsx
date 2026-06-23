@@ -56,6 +56,7 @@ export default function OnboardingScreenController(): React.JSX.Element {
                     onNext={handleNext}
                     onBack={handleBack}
                     canGoBack={currentScreen > FIRST_SCREEN}
+                    canGoNext={currentScreen < LAST_SCREEN}
                 />
             </View>
         </SafeAreaView>

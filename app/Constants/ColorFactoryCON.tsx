@@ -5,6 +5,7 @@ export default class ColorFactoryCON {
     public static readonly CARD_BG: string = "#0a0a0a";
     public static readonly CARD_BG_LIGHT: string = "#111111";
     public static readonly CARD_BG_LIGHT_PRESSED: string = "#1a1a1a";
+    public static readonly INPUT_BG: string = "#141414";
     public static readonly CARD_BAND: string = "#1a1a1a";
     public static readonly CARD_BORDER: string = "#2a2a2a";
 

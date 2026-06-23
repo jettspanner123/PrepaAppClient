@@ -8,6 +8,7 @@ interface OnboardingScreenFABStaticComponentProps {
     onNext: () => void;
     onBack: () => void;
     canGoBack: boolean;
+    canGoNext: boolean;
 }
 
 type FABButtonVariant = "next" | "back";
@@ -103,6 +104,7 @@ export default function OnboardingScreenFABStaticComponent({
     onNext,
     onBack,
     canGoBack,
+    canGoNext,
 }: OnboardingScreenFABStaticComponentProps): React.JSX.Element {
     return (
         <View
@@ -118,7 +120,9 @@ export default function OnboardingScreenFABStaticComponent({
             {canGoBack && (
                 <FABButton variant="back" onPress={onBack} flex={1} />
             )}
-            <FABButton variant="next" onPress={onNext} flex={1} />
+            {canGoNext && (
+                <FABButton variant="next" onPress={onNext} flex={1} />
+            )}
         </View>
     );
 }
