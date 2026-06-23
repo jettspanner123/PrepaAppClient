@@ -14,6 +14,8 @@ export default class ColorFactoryCON {
     public static readonly MUTE: string = "#707072";
     public static readonly HAIRLINE: string = "#cacacb";
 
-    // ─── Shadows ──────────────────────────────────────────────────────
+    // ─── Semantic ─────────────────────────────────────────────────────
+    public static readonly DANGER: string = "#ff2226ff";
+    public static readonly DANGER_MUTED: string = "#2a0a0aa6";
     public static readonly SHADOW: string = "#000000";
 }

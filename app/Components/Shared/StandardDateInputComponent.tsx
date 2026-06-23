@@ -1,5 +1,6 @@
 import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
+import * as Haptics from "expo-haptics";
 import React, { useEffect, useRef, useState } from "react";
 import {
     Animated,
@@ -141,6 +142,9 @@ export default function StandardDateInputComponent({
 
             {/* Trigger */}
             <Pressable
+                onPressIn={() =>
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+                }
                 onPress={handleOpen}
                 className={inputClassName}
                 style={{
@@ -199,10 +203,11 @@ export default function StandardDateInputComponent({
                         style={{
                             transform: [{ translateY: cardTranslateY }],
                             backgroundColor: ColorFactoryCON.CARD_BG_LIGHT,
-                            borderRadius: EdgeInsetsCON.XL,
+                            borderRadius: EdgeInsetsCON.LG,
                             borderWidth: 1,
                             borderColor: ColorFactoryCON.CARD_BORDER,
-                            width: 280,
+                            marginHorizontal: EdgeInsetsCON.SCREEN_H,
+                            alignSelf: "stretch",
                             overflow: "hidden",
                         }}
                     >
@@ -308,11 +313,18 @@ export default function StandardDateInputComponent({
                             }}
                         >
                             <Pressable
+                                onPressIn={() =>
+                                    Haptics.impactAsync(
+                                        Haptics.ImpactFeedbackStyle.Light,
+                                    )
+                                }
                                 onPress={handleCancel}
                                 style={{
                                     flex: 1,
                                     paddingVertical: EdgeInsetsCON.LG,
                                     alignItems: "center",
+                                    backgroundColor:
+                                        ColorFactoryCON.DANGER_MUTED,
                                     borderRightWidth: 1,
                                     borderRightColor:
                                         ColorFactoryCON.CARD_BORDER,
@@ -322,13 +334,18 @@ export default function StandardDateInputComponent({
                                     style={{
                                         fontSize: 16,
                                         fontWeight: "500",
-                                        color: ColorFactoryCON.MUTE,
+                                        color: ColorFactoryCON.DANGER,
                                     }}
                                 >
                                     Cancel
                                 </Text>
                             </Pressable>
                             <Pressable
+                                onPressIn={() =>
+                                    Haptics.impactAsync(
+                                        Haptics.ImpactFeedbackStyle.Medium,
+                                    )
+                                }
                                 onPress={handleConfirm}
                                 style={{
                                     flex: 1,
