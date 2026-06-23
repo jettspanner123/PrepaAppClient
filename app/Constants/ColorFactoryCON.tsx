@@ -11,6 +11,7 @@ export default class ColorFactoryCON {
 
     // ─── Text ─────────────────────────────────────────────────────────
     public static readonly WHITE: string = "#ffffff";
+    public static readonly WHITE_MUTED: string = "#1f1f1f";
     public static readonly MUTE: string = "#707072";
     public static readonly HAIRLINE: string = "#cacacb";
 

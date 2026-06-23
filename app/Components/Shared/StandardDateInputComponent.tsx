@@ -17,8 +17,65 @@ import {
 const CURRENT_YEAR = new Date().getFullYear();
 const DEFAULT_FROM_YEAR = CURRENT_YEAR - 5;
 const DEFAULT_TO_YEAR = CURRENT_YEAR + 10;
-const ITEM_HEIGHT = 52;
+const ITEM_HEIGHT = 40;
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
+
+// ─── Year row item ────────────────────────────────────────────────────────────
+function YearItem({
+    item,
+    isHovered,
+    onPress,
+}: {
+    item: number;
+    isHovered: boolean;
+    onPress: (year: number) => void;
+}): React.JSX.Element {
+    const scale = useRef(new Animated.Value(1)).current;
+    const colorAnim = useRef(new Animated.Value(isHovered ? 1 : 0)).current;
+
+    useEffect(() => {
+        Animated.timing(scale, {
+            toValue: isHovered ? 1.05 : 1,
+            duration: 200,
+            useNativeDriver: true,
+        }).start();
+
+        Animated.timing(colorAnim, {
+            toValue: isHovered ? 1 : 0,
+            duration: 200,
+            useNativeDriver: false,
+        }).start();
+    }, [isHovered]);
+
+    const animatedColor = colorAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [ColorFactoryCON.MUTE, ColorFactoryCON.WHITE],
+    });
+
+    return (
+        <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() => onPress(item)}
+            style={{
+                height: ITEM_HEIGHT,
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+        >
+            <Animated.View style={{ transform: [{ scale }] }}>
+                <Animated.Text
+                    style={{
+                        fontSize: 16,
+                        fontWeight: "400",
+                        color: animatedColor,
+                    }}
+                >
+                    {item}
+                </Animated.Text>
+            </Animated.View>
+        </TouchableOpacity>
+    );
+}
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 interface StandardDateInputComponentProps {
@@ -48,14 +105,15 @@ export default function StandardDateInputComponent({
     );
     const [open, setOpen] = useState<boolean>(false);
     const [tempYear, setTempYear] = useState<number>(value ?? CURRENT_YEAR);
+    const [hoveredYear, setHoveredYear] = useState<number>(
+        value ?? CURRENT_YEAR,
+    );
     const listRef = useRef<FlatList>(null);
+    const lastHapticIndex = useRef<number>(-1);
 
-    // backdrop opacity — cannot use nativeDriver (color-adjacent bg)
     const backdropOpacity = useRef(new Animated.Value(0)).current;
-    // card slide — translateY, can use nativeDriver
     const cardTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
-    // Animate in when open becomes true
     useEffect(() => {
         if (open) {
             Animated.parallel([
@@ -72,7 +130,6 @@ export default function StandardDateInputComponent({
                 }),
             ]).start();
 
-            // Scroll to selected year
             setTimeout(() => {
                 const index = years.indexOf(value ?? CURRENT_YEAR);
                 if (index !== -1) {
@@ -94,13 +151,13 @@ export default function StandardDateInputComponent({
                 duration: 200,
                 useNativeDriver: true,
             }),
-        ]).start(() => {
-            callback();
-        });
+        ]).start(() => callback());
     };
 
     const handleOpen = (): void => {
         setTempYear(value ?? CURRENT_YEAR);
+        setHoveredYear(value ?? CURRENT_YEAR);
+        lastHapticIndex.current = -1;
         backdropOpacity.setValue(0);
         cardTranslateY.setValue(SCREEN_HEIGHT);
         setOpen(true);
@@ -184,7 +241,6 @@ export default function StandardDateInputComponent({
                 animationType="none"
                 onRequestClose={handleCancel}
             >
-                {/* Animated backdrop */}
                 <Animated.View
                     style={{
                         flex: 1,
@@ -198,7 +254,6 @@ export default function StandardDateInputComponent({
                         onPress={handleCancel}
                     />
 
-                    {/* Animated card — slides up from bottom */}
                     <Animated.View
                         style={{
                             transform: [{ translateY: cardTranslateY }],
@@ -246,7 +301,8 @@ export default function StandardDateInputComponent({
                                     right: EdgeInsetsCON.LG,
                                     height: ITEM_HEIGHT,
                                     borderRadius: EdgeInsetsCON.SM,
-                                    backgroundColor: ColorFactoryCON.INK,
+                                    backgroundColor:
+                                        ColorFactoryCON.WHITE_MUTED,
                                     borderWidth: 1,
                                     borderColor: ColorFactoryCON.CARD_BORDER,
                                 }}
@@ -257,7 +313,30 @@ export default function StandardDateInputComponent({
                                 keyExtractor={(item) => String(item)}
                                 showsVerticalScrollIndicator={false}
                                 snapToInterval={ITEM_HEIGHT}
-                                decelerationRate="fast"
+                                decelerationRate={0.96}
+                                scrollEventThrottle={16}
+                                extraData={hoveredYear}
+                                onScroll={(e) => {
+                                    const index = Math.round(
+                                        e.nativeEvent.contentOffset.y /
+                                            ITEM_HEIGHT,
+                                    );
+                                    if (index >= 0 && index < years.length) {
+                                        setHoveredYear(
+                                            years[index] ?? CURRENT_YEAR,
+                                        );
+                                    }
+                                    if (
+                                        index !== lastHapticIndex.current &&
+                                        index >= 0 &&
+                                        index < years.length
+                                    ) {
+                                        lastHapticIndex.current = index;
+                                        Haptics.impactAsync(
+                                            Haptics.ImpactFeedbackStyle.Rigid,
+                                        );
+                                    }
+                                }}
                                 onMomentumScrollEnd={(e) => {
                                     const index = Math.round(
                                         e.nativeEvent.contentOffset.y /
@@ -274,32 +353,11 @@ export default function StandardDateInputComponent({
                                     index,
                                 })}
                                 renderItem={({ item }) => (
-                                    <TouchableOpacity
-                                        activeOpacity={0.7}
-                                        onPress={() => setTempYear(item)}
-                                        style={{
-                                            height: ITEM_HEIGHT,
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                        }}
-                                    >
-                                        <Text
-                                            style={{
-                                                fontSize:
-                                                    item === tempYear ? 20 : 16,
-                                                fontWeight:
-                                                    item === tempYear
-                                                        ? "700"
-                                                        : "400",
-                                                color:
-                                                    item === tempYear
-                                                        ? ColorFactoryCON.WHITE
-                                                        : ColorFactoryCON.MUTE,
-                                            }}
-                                        >
-                                            {item}
-                                        </Text>
-                                    </TouchableOpacity>
+                                    <YearItem
+                                        item={item}
+                                        isHovered={item === hoveredYear}
+                                        onPress={setTempYear}
+                                    />
                                 )}
                             />
                         </View>
@@ -351,6 +409,8 @@ export default function StandardDateInputComponent({
                                     flex: 1,
                                     paddingVertical: EdgeInsetsCON.LG,
                                     alignItems: "center",
+                                    backgroundColor:
+                                        ColorFactoryCON.CARD_BG_LIGHT_PRESSED,
                                 }}
                             >
                                 <Text
