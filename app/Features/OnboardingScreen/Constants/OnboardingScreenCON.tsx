@@ -57,4 +57,16 @@ export default class OnboardingScreenCON {
 
     public static readonly LABEL_ATTEMPT_YEAR: string =
         "Which year will you be attempting?";
+
+    // ─── Date Information View ────────────────────────────────────────
+    public static readonly DATE_INFO_TITLE: string = "Date\nInformation";
+    public static readonly DATE_INFO_SUBTITLE: string =
+        "Help us understand your timeline. Setting the right dates ensures your prep plan is paced perfectly for your goal.";
+
+    public static readonly LABEL_EXAM_YEAR: string = "Which year is your exam";
+    public static readonly LABEL_START_YEAR: string =
+        "Which year are you starting prep";
+    public static readonly LABEL_START_DATE: string =
+        "When are you starting preparation?";
+    public static readonly LABEL_EXAM_DATE: string = "When is the exam?";
 }
