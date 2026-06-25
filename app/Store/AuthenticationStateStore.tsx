@@ -14,6 +14,14 @@ const useAuthenticationStateStore = create<AuthenticationStateStoreInterface>(
         registrationPhone: "",
         setRegistrationPhone: (phone: string) =>
             set({ registrationPhone: phone }),
+
+        registrationFullName: "",
+        setRegistrationFullName: (name: string) =>
+            set({ registrationFullName: name }),
+
+        registrationDateOfBirth: null,
+        setRegistrationDateOfBirth: (date) =>
+            set({ registrationDateOfBirth: date }),
     }),
 );
 

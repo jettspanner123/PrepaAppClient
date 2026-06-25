@@ -9,4 +9,16 @@ export default interface AuthenticationStateStoreInterface {
 
     registrationPhone: string;
     setRegistrationPhone: (phone: string) => void;
+
+    registrationFullName: string;
+    setRegistrationFullName: (name: string) => void;
+
+    registrationDateOfBirth:
+        | import("@/app/Components/Shared/StandardFullDateInputComponent").FullDate
+        | null;
+    setRegistrationDateOfBirth: (
+        date:
+            | import("@/app/Components/Shared/StandardFullDateInputComponent").FullDate
+            | null,
+    ) => void;
 }

@@ -5,7 +5,13 @@ import AuthenticationScreenLoginViewComponent from "@/app/Features/Authenticatio
 import AuthenticationScreenRegistrationViewComponent from "@/app/Features/AuthenticationScreen/Views/AuthenticationScreenRegistrationViewComponent";
 import useAuthenticationStateStore from "@/app/Store/AuthenticationStateStore";
 import React, { useCallback, useEffect, useRef } from "react";
-import { Dimensions, ScrollView, View } from "react-native";
+import {
+    Dimensions,
+    KeyboardAvoidingView,
+    Platform,
+    ScrollView,
+    View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ColorFactoryCON from "../../Constants/ColorFactoryCON";
 import EdgeInsetsCON from "../../Constants/EdgeInsetsCON";
@@ -36,10 +42,10 @@ const LABELS: Record<AuthenticationScreenOptions, string> = {
 export default function AuthenticationScreenController(): React.JSX.Element {
     const { currentScreen, setCurrentScreen, loginPhone, registrationPhone } =
         useAuthenticationStateStore();
-    const scrollRef = useRef<ScrollView>(null);
+    const horizontalScrollRef = useRef<ScrollView>(null);
 
     useEffect(() => {
-        scrollRef.current?.scrollTo({
+        horizontalScrollRef.current?.scrollTo({
             x: currentScreen * SCREEN_WIDTH,
             animated: true,
         });
@@ -55,10 +61,8 @@ export default function AuthenticationScreenController(): React.JSX.Element {
     const handleFABPress = useCallback((): void => {
         if (currentScreen === AuthenticationScreenOptions.LOGIN) {
             console.log("Send OTP — login:", loginPhone);
-            // TODO: trigger login OTP
         } else {
             console.log("Send OTP — registration:", registrationPhone);
-            // TODO: trigger registration OTP
         }
     }, [currentScreen, loginPhone, registrationPhone]);
 
@@ -67,48 +71,77 @@ export default function AuthenticationScreenController(): React.JSX.Element {
             style={{ flex: 1, backgroundColor: ColorFactoryCON.BLACK }}
             edges={[]}
         >
-            {/* Shared header */}
-            <View
-                style={{
-                    paddingHorizontal: EdgeInsetsCON.SCREEN_H,
-                    paddingTop: EdgeInsetsCON.SCREEN_TOP,
-                    gap: EdgeInsetsCON.MD,
-                }}
-            >
-                <StandardPageHeaderComponent
-                    text={AuthenticationScreenCON.PAGE_HEADING}
-                />
-                <StandardPageLabelComponent text={LABELS[currentScreen]} />
-                <StandardSegmentedComponent
-                    options={SEGMENT_OPTIONS}
-                    selectedValue={String(currentScreen)}
-                    onChange={handleSegmentChange}
-                />
-            </View>
-
-            {/* Paged screen content */}
-            <ScrollView
-                ref={scrollRef}
-                horizontal
-                pagingEnabled
-                scrollEnabled={false}
-                showsHorizontalScrollIndicator={false}
+            <KeyboardAvoidingView
                 style={{ flex: 1 }}
+                behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
-                {SCREENS.map((screen) => (
-                    <View key={screen} style={{ width: SCREEN_WIDTH, flex: 1 }}>
-                        {screen === AuthenticationScreenOptions.LOGIN && (
-                            <AuthenticationScreenLoginViewComponent />
-                        )}
-                        {screen ===
-                            AuthenticationScreenOptions.REGISTRATION && (
-                            <AuthenticationScreenRegistrationViewComponent />
-                        )}
+                {/* Outer vertical scroll — scrolls everything together */}
+                <ScrollView
+                    keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={{
+                        paddingBottom: EdgeInsetsCON.SCROLL_BOTTOM_CLEARANCE,
+                    }}
+                >
+                    {/* Header */}
+                    <View
+                        style={{
+                            paddingHorizontal: EdgeInsetsCON.SCREEN_H,
+                            paddingTop: EdgeInsetsCON.SCREEN_TOP,
+                            gap: EdgeInsetsCON.MD,
+                        }}
+                    >
+                        <StandardPageHeaderComponent
+                            text={AuthenticationScreenCON.PAGE_HEADING}
+                        />
+                        <StandardPageLabelComponent
+                            text={LABELS[currentScreen]}
+                        />
+                        <StandardSegmentedComponent
+                            options={SEGMENT_OPTIONS}
+                            selectedValue={String(currentScreen)}
+                            onChange={handleSegmentChange}
+                        />
                     </View>
-                ))}
-            </ScrollView>
 
-            {/* Single FAB — behaviour depends on currentScreen */}
+                    {/* Divider */}
+                    <View
+                        style={{
+                            height: 1,
+                            backgroundColor: ColorFactoryCON.WHITE,
+                            opacity: 0.2,
+                            marginTop: EdgeInsetsCON.XXL,
+                            marginHorizontal: EdgeInsetsCON.XL - 4,
+                            borderRadius: 100,
+                        }}
+                    />
+
+                    {/* Horizontal paging scroll — switches between screens */}
+                    <ScrollView
+                        ref={horizontalScrollRef}
+                        horizontal
+                        pagingEnabled
+                        scrollEnabled={false}
+                        showsHorizontalScrollIndicator={false}
+                        style={{ width: SCREEN_WIDTH }}
+                    >
+                        {SCREENS.map((screen) => (
+                            <View key={screen} style={{ width: SCREEN_WIDTH }}>
+                                {screen ===
+                                    AuthenticationScreenOptions.LOGIN && (
+                                    <AuthenticationScreenLoginViewComponent />
+                                )}
+                                {screen ===
+                                    AuthenticationScreenOptions.REGISTRATION && (
+                                    <AuthenticationScreenRegistrationViewComponent />
+                                )}
+                            </View>
+                        ))}
+                    </ScrollView>
+                </ScrollView>
+            </KeyboardAvoidingView>
+
+            {/* Single FAB */}
             <View
                 style={{
                     position: "absolute",

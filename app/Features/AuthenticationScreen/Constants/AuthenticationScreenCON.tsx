@@ -10,4 +10,9 @@ export default class AuthenticationScreenCON {
     public static readonly LABEL_PHONE: string = "Phone Number";
     public static readonly PLACEHOLDER_PHONE: string = "e.g. 9876543210";
     public static readonly SEND_OTP_LABEL: string = "Send OTP";
+
+    public static readonly LABEL_FULL_NAME: string = "Full Name";
+    public static readonly PLACEHOLDER_FULL_NAME: string =
+        "e.g. Uddeshya Singh";
+    public static readonly LABEL_DATE_OF_BIRTH: string = "Date of Birth";
 }

@@ -1,4 +1,4 @@
-import PageScrollViewHolderComponent from "@/app/Components/Page/PageScrollViewHolderComponent";
+import StandardFullDateInputComponent from "@/app/Components/Shared/StandardFullDateInputComponent";
 import StandardInputComponent from "@/app/Components/Shared/StandardInputComponent";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import AuthenticationScreenCON from "@/app/Features/AuthenticationScreen/Constants/AuthenticationScreenCON";
@@ -7,19 +7,43 @@ import React from "react";
 import { View } from "react-native";
 
 export default function AuthenticationScreenRegistrationViewComponent(): React.JSX.Element {
-    const { registrationPhone, setRegistrationPhone } =
-        useAuthenticationStateStore();
+    const {
+        registrationFullName,
+        setRegistrationFullName,
+        registrationDateOfBirth,
+        setRegistrationDateOfBirth,
+        registrationPhone,
+        setRegistrationPhone,
+    } = useAuthenticationStateStore();
 
     return (
-        <PageScrollViewHolderComponent>
-            <View style={{ gap: EdgeInsetsCON.LG }}>
-                <StandardInputComponent
-                    label={AuthenticationScreenCON.LABEL_PHONE}
-                    value={registrationPhone}
-                    onChangeText={setRegistrationPhone}
-                    placeholder={AuthenticationScreenCON.PLACEHOLDER_PHONE}
-                />
-            </View>
-        </PageScrollViewHolderComponent>
+        <View
+            style={{
+                paddingHorizontal: EdgeInsetsCON.SCREEN_H,
+                paddingTop: EdgeInsetsCON.XL,
+                gap: EdgeInsetsCON.LG,
+            }}
+        >
+            <StandardInputComponent
+                labelClassName="mt-5"
+                label={AuthenticationScreenCON.LABEL_FULL_NAME}
+                value={registrationFullName}
+                onChangeText={setRegistrationFullName}
+                placeholder={AuthenticationScreenCON.PLACEHOLDER_FULL_NAME}
+            />
+            <StandardFullDateInputComponent
+                labelClassName="mt-5"
+                label={AuthenticationScreenCON.LABEL_DATE_OF_BIRTH}
+                value={registrationDateOfBirth}
+                onChange={setRegistrationDateOfBirth}
+            />
+            <StandardInputComponent
+                labelClassName="mt-5"
+                label={AuthenticationScreenCON.LABEL_PHONE}
+                value={registrationPhone}
+                onChangeText={setRegistrationPhone}
+                placeholder={AuthenticationScreenCON.PLACEHOLDER_PHONE}
+            />
+        </View>
     );
 }
