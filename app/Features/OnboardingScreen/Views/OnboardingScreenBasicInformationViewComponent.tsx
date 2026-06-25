@@ -2,13 +2,18 @@ import PageScrollViewHolderComponent from "@/app/Components/Page/PageScrollViewH
 import StandardInputComponent from "@/app/Components/Shared/StandardInputComponent";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import OnboardingScreenCON from "@/app/Features/OnboardingScreen/Constants/OnboardingScreenCON";
-import React, { useState } from "react";
+import useOnboardingStateStore from "@/app/Store/OnboardingStateStore";
+import React from "react";
 import { Text, View } from "react-native";
 
-export default function OnboardingScreenBasicInformationViewComponent(): React.JSX.Element {
-    const [name, setName] = useState<string>("");
-    const [courseName, setCourseName] = useState<string>("");
-    const [profileName, setProfileName] = useState<string>("");
+interface OnboardingScreenBasicInformationViewComponentProps {
+    errors?: { name?: boolean; courseName?: boolean; profileName?: boolean };
+}
+
+export default function OnboardingScreenBasicInformationViewComponent({
+    errors = {},
+}: OnboardingScreenBasicInformationViewComponentProps): React.JSX.Element {
+    const { basicInfo, setBasicInfo } = useOnboardingStateStore();
 
     return (
         <PageScrollViewHolderComponent>
@@ -24,23 +29,26 @@ export default function OnboardingScreenBasicInformationViewComponent(): React.J
             >
                 <StandardInputComponent
                     label={OnboardingScreenCON.LABEL_NAME}
-                    value={name}
-                    onChangeText={setName}
+                    value={basicInfo.name}
+                    onChangeText={(text) => setBasicInfo({ name: text })}
                     placeholder={OnboardingScreenCON.PLACEHOLDER_NAME}
+                    hasError={errors.name}
                 />
                 <StandardInputComponent
                     label={OnboardingScreenCON.LABEL_COURSE_NAME}
-                    value={courseName}
-                    onChangeText={setCourseName}
+                    value={basicInfo.courseName}
+                    onChangeText={(text) => setBasicInfo({ courseName: text })}
                     placeholder={OnboardingScreenCON.PLACEHOLDER_COURSE_NAME}
                     labelClassName="mt-5"
+                    hasError={errors.courseName}
                 />
                 <StandardInputComponent
                     label={OnboardingScreenCON.LABEL_PROFILE_NAME}
-                    value={profileName}
-                    onChangeText={setProfileName}
+                    value={basicInfo.profileName}
+                    onChangeText={(text) => setBasicInfo({ profileName: text })}
                     placeholder={OnboardingScreenCON.PLACEHOLDER_PROFILE_NAME}
                     labelClassName="mt-5"
+                    hasError={errors.profileName}
                 />
             </View>
         </PageScrollViewHolderComponent>

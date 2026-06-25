@@ -29,7 +29,7 @@ function FABButton({
     const handlePressOut = (): void => setPressed(false);
 
     const handlePress = (): void => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
         onPress();
     };
 

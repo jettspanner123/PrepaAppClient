@@ -1,17 +1,19 @@
 import PageScrollViewHolderComponent from "@/app/Components/Page/PageScrollViewHolderComponent";
-import StandardFullDateInputComponent, {
-    FullDate,
-} from "@/app/Components/Shared/StandardFullDateInputComponent";
+import StandardFullDateInputComponent from "@/app/Components/Shared/StandardFullDateInputComponent";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import OnboardingScreenCON from "@/app/Features/OnboardingScreen/Constants/OnboardingScreenCON";
-import React, { useState } from "react";
+import useOnboardingStateStore from "@/app/Store/OnboardingStateStore";
+import React from "react";
 import { Text, View } from "react-native";
 
-export default function OnboardingScreenDateInformationViewComponent(): React.JSX.Element {
-    const [examYear, setExamYear] = useState<number | null>(null);
-    const [startYear, setStartYear] = useState<number | null>(null);
-    const [startDate, setStartDate] = useState<FullDate | null>(null);
-    const [examDate, setExamDate] = useState<FullDate | null>(null);
+interface OnboardingScreenDateInformationViewComponentProps {
+    errors?: { startDate?: boolean; examDate?: boolean };
+}
+
+export default function OnboardingScreenDateInformationViewComponent({
+    errors = {},
+}: OnboardingScreenDateInformationViewComponentProps): React.JSX.Element {
+    const { dateInfo, setDateInfo } = useOnboardingStateStore();
 
     return (
         <PageScrollViewHolderComponent>
@@ -27,15 +29,17 @@ export default function OnboardingScreenDateInformationViewComponent(): React.JS
             >
                 <StandardFullDateInputComponent
                     label={OnboardingScreenCON.LABEL_START_DATE}
-                    value={startDate}
-                    onChange={setStartDate}
+                    value={dateInfo.startDate}
+                    onChange={(date) => setDateInfo({ startDate: date })}
                     labelClassName="mt-5"
+                    hasError={errors.startDate}
                 />
                 <StandardFullDateInputComponent
                     label={OnboardingScreenCON.LABEL_EXAM_DATE}
-                    value={examDate}
-                    onChange={setExamDate}
+                    value={dateInfo.examDate}
+                    onChange={(date) => setDateInfo({ examDate: date })}
                     labelClassName="mt-5"
+                    hasError={errors.examDate}
                 />
             </View>
         </PageScrollViewHolderComponent>

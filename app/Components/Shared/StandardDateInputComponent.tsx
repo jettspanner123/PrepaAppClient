@@ -87,6 +87,7 @@ interface StandardDateInputComponentProps {
     labelClassName?: string;
     fromYear?: number;
     toYear?: number;
+    hasError?: boolean;
 }
 
 export default function StandardDateInputComponent({
@@ -98,6 +99,7 @@ export default function StandardDateInputComponent({
     labelClassName,
     fromYear = DEFAULT_FROM_YEAR,
     toYear = DEFAULT_TO_YEAR,
+    hasError = false,
 }: StandardDateInputComponentProps): React.JSX.Element {
     const years: number[] = Array.from(
         { length: toYear - fromYear + 1 },
@@ -110,6 +112,38 @@ export default function StandardDateInputComponent({
     );
     const listRef = useRef<FlatList>(null);
     const lastHapticIndex = useRef<number>(-1);
+    const shakeAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (!hasError) return;
+        Animated.sequence([
+            Animated.timing(shakeAnim, {
+                toValue: 8,
+                duration: 60,
+                useNativeDriver: true,
+            }),
+            Animated.timing(shakeAnim, {
+                toValue: -8,
+                duration: 60,
+                useNativeDriver: true,
+            }),
+            Animated.timing(shakeAnim, {
+                toValue: 6,
+                duration: 60,
+                useNativeDriver: true,
+            }),
+            Animated.timing(shakeAnim, {
+                toValue: -6,
+                duration: 60,
+                useNativeDriver: true,
+            }),
+            Animated.timing(shakeAnim, {
+                toValue: 0,
+                duration: 60,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    }, [hasError]);
 
     const backdropOpacity = useRef(new Animated.Value(0)).current;
     const cardTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
@@ -187,7 +221,9 @@ export default function StandardDateInputComponent({
                 style={{
                     fontSize: 11,
                     fontWeight: "600",
-                    color: ColorFactoryCON.MUTE,
+                    color: hasError
+                        ? ColorFactoryCON.DANGER
+                        : ColorFactoryCON.MUTE,
                     textTransform: "uppercase",
                     letterSpacing: 1.5,
                     marginBottom: 5,
@@ -198,41 +234,45 @@ export default function StandardDateInputComponent({
             </Text>
 
             {/* Trigger */}
-            <Pressable
-                onPressIn={() =>
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-                }
-                onPress={handleOpen}
-                className={inputClassName}
-                style={{
-                    backgroundColor: ColorFactoryCON.INPUT_BG,
-                    borderRadius: EdgeInsetsCON.MD,
-                    borderWidth: 1,
-                    borderColor: open
-                        ? ColorFactoryCON.WHITE
-                        : ColorFactoryCON.CARD_BORDER,
-                    paddingHorizontal: EdgeInsetsCON.LG,
-                    paddingVertical: EdgeInsetsCON.LG,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                }}
-            >
-                <Text
+            <Animated.View style={{ transform: [{ translateX: shakeAnim }] }}>
+                <Pressable
+                    onPressIn={() =>
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+                    }
+                    onPress={handleOpen}
+                    className={inputClassName}
                     style={{
-                        fontSize: 16,
-                        fontWeight: "500",
-                        color: value
-                            ? ColorFactoryCON.WHITE
-                            : ColorFactoryCON.MUTE,
+                        backgroundColor: ColorFactoryCON.INPUT_BG,
+                        borderRadius: EdgeInsetsCON.MD,
+                        borderWidth: 1,
+                        borderColor: hasError
+                            ? ColorFactoryCON.DANGER
+                            : open
+                              ? ColorFactoryCON.WHITE
+                              : ColorFactoryCON.CARD_BORDER,
+                        paddingHorizontal: EdgeInsetsCON.LG,
+                        paddingVertical: EdgeInsetsCON.LG,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
                     }}
                 >
-                    {value ? String(value) : placeholder}
-                </Text>
-                <Text style={{ fontSize: 14, color: ColorFactoryCON.MUTE }}>
-                    ›
-                </Text>
-            </Pressable>
+                    <Text
+                        style={{
+                            fontSize: 16,
+                            fontWeight: "500",
+                            color: value
+                                ? ColorFactoryCON.WHITE
+                                : ColorFactoryCON.MUTE,
+                        }}
+                    >
+                        {value ? String(value) : placeholder}
+                    </Text>
+                    <Text style={{ fontSize: 14, color: ColorFactoryCON.MUTE }}>
+                        ›
+                    </Text>
+                </Pressable>
+            </Animated.View>
 
             {/* Year picker modal */}
             <Modal

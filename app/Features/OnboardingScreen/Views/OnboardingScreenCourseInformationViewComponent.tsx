@@ -3,12 +3,18 @@ import StandardDateInputComponent from "@/app/Components/Shared/StandardDateInpu
 import StandardInputComponent from "@/app/Components/Shared/StandardInputComponent";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import OnboardingScreenCON from "@/app/Features/OnboardingScreen/Constants/OnboardingScreenCON";
-import React, { useState } from "react";
+import useOnboardingStateStore from "@/app/Store/OnboardingStateStore";
+import React from "react";
 import { Text, View } from "react-native";
 
-export default function OnboardingScreenCourseInformationViewComponent(): React.JSX.Element {
-    const [studyingFor, setStudyingFor] = useState<string>("");
-    const [attemptYear, setAttemptYear] = useState<number | null>(null);
+interface OnboardingScreenCourseInformationViewComponentProps {
+    errors?: { studyingFor?: boolean; attemptYear?: boolean };
+}
+
+export default function OnboardingScreenCourseInformationViewComponent({
+    errors = {},
+}: OnboardingScreenCourseInformationViewComponentProps): React.JSX.Element {
+    const { courseInfo, setCourseInfo } = useOnboardingStateStore();
 
     return (
         <PageScrollViewHolderComponent>
@@ -24,15 +30,19 @@ export default function OnboardingScreenCourseInformationViewComponent(): React.
             >
                 <StandardInputComponent
                     label={OnboardingScreenCON.LABEL_STUDYING_FOR}
-                    value={studyingFor}
-                    onChangeText={setStudyingFor}
+                    value={courseInfo.studyingFor}
+                    onChangeText={(text) =>
+                        setCourseInfo({ studyingFor: text })
+                    }
                     placeholder={OnboardingScreenCON.PLACEHOLDER_STUDYING_FOR}
+                    hasError={errors.studyingFor}
                 />
                 <StandardDateInputComponent
                     label={OnboardingScreenCON.LABEL_ATTEMPT_YEAR}
-                    value={attemptYear}
-                    onChange={setAttemptYear}
+                    value={courseInfo.attemptYear}
+                    onChange={(year) => setCourseInfo({ attemptYear: year })}
                     labelClassName="mt-5"
+                    hasError={errors.attemptYear}
                 />
             </View>
         </PageScrollViewHolderComponent>

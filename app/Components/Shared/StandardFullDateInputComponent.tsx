@@ -21,8 +21,18 @@ const ITEM_HEIGHT = 40;
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
 
 const MONTHS = [
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
 ];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -163,7 +173,6 @@ function WheelColumn({
     );
 }
 
-// ─── Props ────────────────────────────────────────────────────────────────────
 interface StandardFullDateInputComponentProps {
     label: string;
     value: FullDate | null;
@@ -173,6 +182,7 @@ interface StandardFullDateInputComponentProps {
     labelClassName?: string;
     fromYear?: number;
     toYear?: number;
+    hasError?: boolean;
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -195,6 +205,7 @@ export default function StandardFullDateInputComponent({
     labelClassName,
     fromYear = DEFAULT_FROM_YEAR,
     toYear = DEFAULT_TO_YEAR,
+    hasError = false,
 }: StandardFullDateInputComponentProps): React.JSX.Element {
     const today = new Date();
     const defaultDate: FullDate = value ?? {
@@ -203,9 +214,8 @@ export default function StandardFullDateInputComponent({
         year: today.getFullYear(),
     };
 
-    const years = Array.from(
-        { length: toYear - fromYear + 1 },
-        (_, i) => String(fromYear + i),
+    const years = Array.from({ length: toYear - fromYear + 1 }, (_, i) =>
+        String(fromYear + i),
     );
 
     const [open, setOpen] = useState<boolean>(false);
@@ -218,6 +228,38 @@ export default function StandardFullDateInputComponent({
 
     const backdropOpacity = useRef(new Animated.Value(0)).current;
     const cardTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+    const shakeAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        if (!hasError) return;
+        Animated.sequence([
+            Animated.timing(shakeAnim, {
+                toValue: 8,
+                duration: 60,
+                useNativeDriver: true,
+            }),
+            Animated.timing(shakeAnim, {
+                toValue: -8,
+                duration: 60,
+                useNativeDriver: true,
+            }),
+            Animated.timing(shakeAnim, {
+                toValue: 6,
+                duration: 60,
+                useNativeDriver: true,
+            }),
+            Animated.timing(shakeAnim, {
+                toValue: -6,
+                duration: 60,
+                useNativeDriver: true,
+            }),
+            Animated.timing(shakeAnim, {
+                toValue: 0,
+                duration: 60,
+                useNativeDriver: true,
+            }),
+        ]).start();
+    }, [hasError]);
 
     const days = Array.from(
         { length: getDaysInMonth(tempDate.month, tempDate.year) },
@@ -292,7 +334,9 @@ export default function StandardFullDateInputComponent({
                 style={{
                     fontSize: 11,
                     fontWeight: "600",
-                    color: ColorFactoryCON.MUTE,
+                    color: hasError
+                        ? ColorFactoryCON.DANGER
+                        : ColorFactoryCON.MUTE,
                     textTransform: "uppercase",
                     letterSpacing: 1.5,
                     marginBottom: 5,
@@ -303,37 +347,45 @@ export default function StandardFullDateInputComponent({
             </Text>
 
             {/* Trigger */}
-            <Pressable
-                onPressIn={() =>
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
-                }
-                onPress={handleOpen}
-                className={inputClassName}
-                style={{
-                    backgroundColor: ColorFactoryCON.INPUT_BG,
-                    borderRadius: EdgeInsetsCON.MD,
-                    borderWidth: 1,
-                    borderColor: open
-                        ? ColorFactoryCON.WHITE
-                        : ColorFactoryCON.CARD_BORDER,
-                    paddingHorizontal: EdgeInsetsCON.LG,
-                    paddingVertical: EdgeInsetsCON.LG,
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                }}
-            >
-                <Text
+            <Animated.View style={{ transform: [{ translateX: shakeAnim }] }}>
+                <Pressable
+                    onPressIn={() =>
+                        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+                    }
+                    onPress={handleOpen}
+                    className={inputClassName}
                     style={{
-                        fontSize: 16,
-                        fontWeight: "500",
-                        color: value ? ColorFactoryCON.WHITE : ColorFactoryCON.MUTE,
+                        backgroundColor: ColorFactoryCON.INPUT_BG,
+                        borderRadius: EdgeInsetsCON.MD,
+                        borderWidth: 1,
+                        borderColor: hasError
+                            ? ColorFactoryCON.DANGER
+                            : open
+                              ? ColorFactoryCON.WHITE
+                              : ColorFactoryCON.CARD_BORDER,
+                        paddingHorizontal: EdgeInsetsCON.LG,
+                        paddingVertical: EdgeInsetsCON.LG,
+                        flexDirection: "row",
+                        alignItems: "center",
+                        justifyContent: "space-between",
                     }}
                 >
-                    {value ? formatDate(value) : placeholder}
-                </Text>
-                <Text style={{ fontSize: 14, color: ColorFactoryCON.MUTE }}>›</Text>
-            </Pressable>
+                    <Text
+                        style={{
+                            fontSize: 16,
+                            fontWeight: "500",
+                            color: value
+                                ? ColorFactoryCON.WHITE
+                                : ColorFactoryCON.MUTE,
+                        }}
+                    >
+                        {value ? formatDate(value) : placeholder}
+                    </Text>
+                    <Text style={{ fontSize: 14, color: ColorFactoryCON.MUTE }}>
+                        ›
+                    </Text>
+                </Pressable>
+            </Animated.View>
 
             {/* Modal */}
             <Modal
@@ -407,7 +459,8 @@ export default function StandardFullDateInputComponent({
                                     right: EdgeInsetsCON.LG,
                                     height: ITEM_HEIGHT,
                                     borderRadius: EdgeInsetsCON.SM,
-                                    backgroundColor: ColorFactoryCON.WHITE_MUTED,
+                                    backgroundColor:
+                                        ColorFactoryCON.WHITE_MUTED,
                                     borderWidth: 1,
                                     borderColor: ColorFactoryCON.CARD_BORDER,
                                 }}
@@ -420,7 +473,10 @@ export default function StandardFullDateInputComponent({
                                 onHoverChange={setHoveredDay}
                                 onSelectIndex={(i) => {
                                     setHoveredDay(i);
-                                    setTempDate((prev) => ({ ...prev, day: i + 1 }));
+                                    setTempDate((prev) => ({
+                                        ...prev,
+                                        day: i + 1,
+                                    }));
                                 }}
                             />
 
@@ -428,7 +484,8 @@ export default function StandardFullDateInputComponent({
                             <View
                                 style={{
                                     width: 1,
-                                    backgroundColor: ColorFactoryCON.CARD_BORDER,
+                                    backgroundColor:
+                                        ColorFactoryCON.CARD_BORDER,
                                     marginVertical: EdgeInsetsCON.SM,
                                 }}
                             />
@@ -440,7 +497,10 @@ export default function StandardFullDateInputComponent({
                                 onHoverChange={setHoveredMonth}
                                 onSelectIndex={(i) => {
                                     setHoveredMonth(i);
-                                    setTempDate((prev) => ({ ...prev, month: i }));
+                                    setTempDate((prev) => ({
+                                        ...prev,
+                                        month: i,
+                                    }));
                                 }}
                             />
 
@@ -448,7 +508,8 @@ export default function StandardFullDateInputComponent({
                             <View
                                 style={{
                                     width: 1,
-                                    backgroundColor: ColorFactoryCON.CARD_BORDER,
+                                    backgroundColor:
+                                        ColorFactoryCON.CARD_BORDER,
                                     marginVertical: EdgeInsetsCON.SM,
                                 }}
                             />
@@ -487,9 +548,11 @@ export default function StandardFullDateInputComponent({
                                     flex: 1,
                                     paddingVertical: EdgeInsetsCON.LG,
                                     alignItems: "center",
-                                    backgroundColor: ColorFactoryCON.DANGER_MUTED,
+                                    backgroundColor:
+                                        ColorFactoryCON.DANGER_MUTED,
                                     borderRightWidth: 1,
-                                    borderRightColor: ColorFactoryCON.CARD_BORDER,
+                                    borderRightColor:
+                                        ColorFactoryCON.CARD_BORDER,
                                 }}
                             >
                                 <Text

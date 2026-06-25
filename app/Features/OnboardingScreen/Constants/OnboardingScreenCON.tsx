@@ -69,4 +69,9 @@ export default class OnboardingScreenCON {
     public static readonly LABEL_START_DATE: string =
         "When are you starting preparation?";
     public static readonly LABEL_EXAM_DATE: string = "When is the exam?";
+
+    // ─── Save Screen View ─────────────────────────────────────────────
+    public static readonly SAVE_TITLE: string = "You're All\nSet!";
+    public static readonly SAVE_SUBTITLE: string =
+        "Everything looks good. Tap below to save your profile and start your prep journey.";
 }

@@ -1,16 +1,18 @@
+import OnboardingScreenBasicInformationViewComponent from "@/app/Features/OnboardingScreen/Views/OnboardingScreenBasicInformationViewComponent";
+import OnboardingScreenCourseInformationViewComponent from "@/app/Features/OnboardingScreen/Views/OnboardingScreenCourseInformationViewComponent";
+import OnboardingScreenDateInformationViewComponent from "@/app/Features/OnboardingScreen/Views/OnboardingScreenDateInformationViewComponent";
+import OnboardingScreenInitialViewComponent from "@/app/Features/OnboardingScreen/Views/OnboardingScreenInitialViewComponent";
+import OnboardingScreenSaveScreenViewComponent from "@/app/Features/OnboardingScreen/Views/OnboardingScreenSaveScreenViewComponent";
 import useOnboardingStateStore from "@/app/Store/OnboardingStateStore";
-import React, { useCallback, useEffect, useRef } from "react";
+import * as Haptics from "expo-haptics";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Dimensions, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ColorFactoryCON from "../../Constants/ColorFactoryCON";
 import EdgeInsetsCON from "../../Constants/EdgeInsetsCON";
 import OnboardingScreenFABStaticComponent from "./Components/static/OnboardingScreenFABStaticComponent";
+import OnboardingScreenProgressBarStaticComponent from "./Components/static/OnboardingScreenProgressBarStaticComponent";
 import OnboardingScreenOptions from "./Models/OnboardingScreenOptions";
-import OnboardingScreenBasicInformationViewComponent from "./Views/OnboardingScreenBasicInformationViewComponent";
-import OnboardingScreenCourseInformationViewComponent from "./Views/OnboardingScreenCourseInformationViewComponent";
-import OnboardingScreenDateInformationViewComponent from "./Views/OnboardingScreenDateInformationViewComponent";
-import OnboardingScreenInitialViewComponent from "./Views/OnboardingScreenInitialViewComponent";
-import OnboardingScreenSaveScreenViewComponent from "./Views/OnboardingScreenSaveScreenViewComponent";
 
 const FIRST_SCREEN = OnboardingScreenOptions.INITIAL_SCREEN;
 const LAST_SCREEN = OnboardingScreenOptions.SAVE_SCREEN;
@@ -23,11 +25,34 @@ const SCREENS = [
     LAST_SCREEN,
 ];
 
+// ─── Error shape per screen ───────────────────────────────────────────────────
+interface BasicInfoErrors {
+    name?: boolean;
+    courseName?: boolean;
+    profileName?: boolean;
+}
+
+interface CourseInfoErrors {
+    studyingFor?: boolean;
+    attemptYear?: boolean;
+}
+
+interface DateInfoErrors {
+    startDate?: boolean;
+    examDate?: boolean;
+}
+
 export default function OnboardingScreenController(): React.JSX.Element {
-    const { currentScreen, setCurrentScreen } = useOnboardingStateStore();
+    const { currentScreen, setCurrentScreen, basicInfo, courseInfo, dateInfo } =
+        useOnboardingStateStore();
     const scrollRef = useRef<ScrollView>(null);
 
-    // Scroll to the correct page whenever currentScreen changes
+    const [basicInfoErrors, setBasicInfoErrors] = useState<BasicInfoErrors>({});
+    const [courseInfoErrors, setCourseInfoErrors] = useState<CourseInfoErrors>(
+        {},
+    );
+    const [dateInfoErrors, setDateInfoErrors] = useState<DateInfoErrors>({});
+
     useEffect(() => {
         scrollRef.current?.scrollTo({
             x: currentScreen * SCREEN_WIDTH,
@@ -35,11 +60,71 @@ export default function OnboardingScreenController(): React.JSX.Element {
         });
     }, [currentScreen]);
 
+    // ─── Validators ───────────────────────────────────────────────────────────
+    const validateBasicInfo = useCallback((): boolean => {
+        const errors: BasicInfoErrors = {
+            name: basicInfo.name.trim() === "",
+            courseName: basicInfo.courseName.trim() === "",
+            profileName: basicInfo.profileName.trim() === "",
+        };
+        const hasErrors = Object.values(errors).some(Boolean);
+        if (hasErrors) {
+            setBasicInfoErrors(errors);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        }
+        return !hasErrors;
+    }, [basicInfo]);
+
+    const validateCourseInfo = useCallback((): boolean => {
+        const errors: CourseInfoErrors = {
+            studyingFor: courseInfo.studyingFor.trim() === "",
+            attemptYear: courseInfo.attemptYear === null,
+        };
+        const hasErrors = Object.values(errors).some(Boolean);
+        if (hasErrors) {
+            setCourseInfoErrors(errors);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        }
+        return !hasErrors;
+    }, [courseInfo]);
+
+    const validateDateInfo = useCallback((): boolean => {
+        const errors: DateInfoErrors = {
+            startDate: dateInfo.startDate === null,
+            examDate: dateInfo.examDate === null,
+        };
+        const hasErrors = Object.values(errors).some(Boolean);
+        if (hasErrors) {
+            setDateInfoErrors(errors);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+        }
+        return !hasErrors;
+    }, [dateInfo]);
+
+    // ─── Navigation ───────────────────────────────────────────────────────────
     const handleNext = useCallback((): void => {
+        if (currentScreen === OnboardingScreenOptions.BASIC_INFORMATION) {
+            if (!validateBasicInfo()) return;
+            setBasicInfoErrors({});
+        }
+        if (currentScreen === OnboardingScreenOptions.COURSE_INFORMATION) {
+            if (!validateCourseInfo()) return;
+            setCourseInfoErrors({});
+        }
+        if (currentScreen === OnboardingScreenOptions.DATE_INFORMATION) {
+            if (!validateDateInfo()) return;
+            setDateInfoErrors({});
+        }
         if (currentScreen < LAST_SCREEN) {
             setCurrentScreen(currentScreen + 1);
         }
-    }, [currentScreen, setCurrentScreen]);
+    }, [
+        currentScreen,
+        setCurrentScreen,
+        validateBasicInfo,
+        validateCourseInfo,
+        validateDateInfo,
+    ]);
 
     const handleBack = useCallback((): void => {
         if (currentScreen > FIRST_SCREEN) {
@@ -52,7 +137,6 @@ export default function OnboardingScreenController(): React.JSX.Element {
             style={{ flex: 1, backgroundColor: ColorFactoryCON.BLACK }}
             edges={[]}
         >
-            {/* Horizontal paged scroll view — all screens pre-rendered side by side */}
             <ScrollView
                 ref={scrollRef}
                 horizontal
@@ -71,15 +155,21 @@ export default function OnboardingScreenController(): React.JSX.Element {
                         )}
                         {screen ===
                             OnboardingScreenOptions.BASIC_INFORMATION && (
-                            <OnboardingScreenBasicInformationViewComponent />
+                            <OnboardingScreenBasicInformationViewComponent
+                                errors={basicInfoErrors}
+                            />
                         )}
                         {screen ===
                             OnboardingScreenOptions.COURSE_INFORMATION && (
-                            <OnboardingScreenCourseInformationViewComponent />
+                            <OnboardingScreenCourseInformationViewComponent
+                                errors={courseInfoErrors}
+                            />
                         )}
                         {screen ===
                             OnboardingScreenOptions.DATE_INFORMATION && (
-                            <OnboardingScreenDateInformationViewComponent />
+                            <OnboardingScreenDateInformationViewComponent
+                                errors={dateInfoErrors}
+                            />
                         )}
                         {screen === OnboardingScreenOptions.SAVE_SCREEN && (
                             <OnboardingScreenSaveScreenViewComponent />
@@ -99,6 +189,18 @@ export default function OnboardingScreenController(): React.JSX.Element {
                 }}
                 pointerEvents="box-none"
             >
+                <View
+                    style={{
+                        position: "absolute",
+                        bottom: EdgeInsetsCON.SCROLL_BOTTOM_CLEARANCE,
+                        left: EdgeInsetsCON.SCREEN_H,
+                        right: EdgeInsetsCON.SCREEN_H,
+                    }}
+                >
+                    <OnboardingScreenProgressBarStaticComponent
+                        progress={currentScreen / LAST_SCREEN}
+                    />
+                </View>
                 <OnboardingScreenFABStaticComponent
                     onNext={handleNext}
                     onBack={handleBack}
