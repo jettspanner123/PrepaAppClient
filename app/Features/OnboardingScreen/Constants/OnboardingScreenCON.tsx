@@ -15,18 +15,22 @@ export default class OnboardingScreenCON {
     public static readonly INITIAL_STEPS: {
         step: string;
         description: string;
+        accentColor: string;
     }[] = [
         {
             step: "Basic Info",
             description: "Your name, course and profile name.",
+            accentColor: "#1eaa52",
         },
         {
             step: "Course Info",
             description: "Details about what you're studying.",
+            accentColor: "#1eaa52",
         },
         {
             step: "Key Dates",
             description: "Your exam date and study start date.",
+            accentColor: "#1eaa52",
         },
     ];
 

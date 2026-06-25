@@ -40,6 +40,7 @@ export default function OnboardingScreenInitialViewComponent(): React.JSX.Elemen
                         index={index}
                         step={item.step}
                         description={item.description}
+                        accentColor={item.accentColor}
                     />
                 ))}
             </View>

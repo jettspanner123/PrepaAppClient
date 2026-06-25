@@ -7,12 +7,14 @@ interface OnboardingScreenStepCardStaticComponentProps {
     index: number;
     step: string;
     description: string;
+    accentColor?: string;
 }
 
 export default function OnboardingScreenStepCardStaticComponent({
     index,
     step,
     description,
+    accentColor = ColorFactoryCON.WHITE,
 }: OnboardingScreenStepCardStaticComponentProps): React.JSX.Element {
     return (
         <View
@@ -36,7 +38,7 @@ export default function OnboardingScreenStepCardStaticComponent({
                     borderRadius: 16,
                     backgroundColor: ColorFactoryCON.INK,
                     borderWidth: 1,
-                    borderColor: ColorFactoryCON.CARD_BORDER,
+                    borderColor: accentColor,
                     alignItems: "center",
                     justifyContent: "center",
                 }}
@@ -45,7 +47,7 @@ export default function OnboardingScreenStepCardStaticComponent({
                     style={{
                         fontSize: 13,
                         fontWeight: "700",
-                        color: ColorFactoryCON.WHITE,
+                        color: accentColor,
                     }}
                 >
                     {index + 1}

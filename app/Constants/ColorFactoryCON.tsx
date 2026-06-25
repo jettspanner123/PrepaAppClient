@@ -19,5 +19,7 @@ export default class ColorFactoryCON {
     public static readonly DANGER: string = "#ff2226ff";
     public static readonly DANGER_MUTED: string = "#2a0a0aa6";
     public static readonly SUCCESS: string = "#1eaa52";
+    public static readonly WARNING: string = "#f59e0b";
+    public static readonly ORANGE: string = "#f97316";
     public static readonly SHADOW: string = "#000000";
 }
