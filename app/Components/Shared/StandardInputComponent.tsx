@@ -11,6 +11,7 @@ interface StandardInputComponentProps {
     inputClassName?: string;
     labelClassName?: string;
     hasError?: boolean;
+    isValid?: boolean;
 }
 
 export default function StandardInputComponent({
@@ -21,13 +22,13 @@ export default function StandardInputComponent({
     inputClassName,
     labelClassName,
     hasError = false,
+    isValid = false,
 }: StandardInputComponentProps): React.JSX.Element {
     const [focused, setFocused] = useState<boolean>(false);
     const shakeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         if (!hasError) return;
-        // 4-step shake sequence
         Animated.sequence([
             Animated.timing(shakeAnim, {
                 toValue: 8,
@@ -57,11 +58,19 @@ export default function StandardInputComponent({
         ]).start();
     }, [hasError]);
 
-    const borderColor = hasError
-        ? ColorFactoryCON.DANGER
-        : focused
-          ? ColorFactoryCON.WHITE
-          : ColorFactoryCON.CARD_BORDER;
+    const borderColor = isValid
+        ? ColorFactoryCON.SUCCESS
+        : hasError
+          ? ColorFactoryCON.DANGER
+          : focused
+            ? ColorFactoryCON.WHITE
+            : ColorFactoryCON.CARD_BORDER;
+
+    const labelColor = isValid
+        ? ColorFactoryCON.SUCCESS
+        : hasError
+          ? ColorFactoryCON.DANGER
+          : ColorFactoryCON.MUTE;
 
     return (
         <View style={{ gap: EdgeInsetsCON.XS }}>
@@ -70,9 +79,7 @@ export default function StandardInputComponent({
                 style={{
                     fontSize: 11,
                     fontWeight: "600",
-                    color: hasError
-                        ? ColorFactoryCON.DANGER
-                        : ColorFactoryCON.MUTE,
+                    color: labelColor,
                     textTransform: "uppercase",
                     letterSpacing: 1.5,
                     marginBottom: 5,
@@ -84,9 +91,7 @@ export default function StandardInputComponent({
             <Animated.View style={{ transform: [{ translateX: shakeAnim }] }}>
                 <TextInput
                     value={value}
-                    onChangeText={(text) => {
-                        onChangeText(text);
-                    }}
+                    onChangeText={onChangeText}
                     placeholder={placeholder}
                     placeholderTextColor={ColorFactoryCON.MUTE}
                     onFocus={() => setFocused(true)}

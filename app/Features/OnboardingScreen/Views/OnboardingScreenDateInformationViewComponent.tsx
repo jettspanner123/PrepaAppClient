@@ -8,10 +8,12 @@ import { Text, View } from "react-native";
 
 interface OnboardingScreenDateInformationViewComponentProps {
     errors?: { startDate?: boolean; examDate?: boolean };
+    allValid?: boolean;
 }
 
 export default function OnboardingScreenDateInformationViewComponent({
     errors = {},
+    allValid = false,
 }: OnboardingScreenDateInformationViewComponentProps): React.JSX.Element {
     const { dateInfo, setDateInfo } = useOnboardingStateStore();
 
@@ -33,6 +35,7 @@ export default function OnboardingScreenDateInformationViewComponent({
                     onChange={(date) => setDateInfo({ startDate: date })}
                     labelClassName="mt-5"
                     hasError={errors.startDate}
+                    isValid={allValid}
                 />
                 <StandardFullDateInputComponent
                     label={OnboardingScreenCON.LABEL_EXAM_DATE}
@@ -40,6 +43,7 @@ export default function OnboardingScreenDateInformationViewComponent({
                     onChange={(date) => setDateInfo({ examDate: date })}
                     labelClassName="mt-5"
                     hasError={errors.examDate}
+                    isValid={allValid}
                 />
             </View>
         </PageScrollViewHolderComponent>

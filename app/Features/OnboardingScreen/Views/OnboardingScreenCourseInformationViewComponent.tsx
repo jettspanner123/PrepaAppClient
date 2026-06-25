@@ -9,10 +9,12 @@ import { Text, View } from "react-native";
 
 interface OnboardingScreenCourseInformationViewComponentProps {
     errors?: { studyingFor?: boolean; attemptYear?: boolean };
+    allValid?: boolean;
 }
 
 export default function OnboardingScreenCourseInformationViewComponent({
     errors = {},
+    allValid = false,
 }: OnboardingScreenCourseInformationViewComponentProps): React.JSX.Element {
     const { courseInfo, setCourseInfo } = useOnboardingStateStore();
 
@@ -36,6 +38,7 @@ export default function OnboardingScreenCourseInformationViewComponent({
                     }
                     placeholder={OnboardingScreenCON.PLACEHOLDER_STUDYING_FOR}
                     hasError={errors.studyingFor}
+                    isValid={allValid}
                 />
                 <StandardDateInputComponent
                     label={OnboardingScreenCON.LABEL_ATTEMPT_YEAR}
@@ -43,6 +46,7 @@ export default function OnboardingScreenCourseInformationViewComponent({
                     onChange={(year) => setCourseInfo({ attemptYear: year })}
                     labelClassName="mt-5"
                     hasError={errors.attemptYear}
+                    isValid={allValid}
                 />
             </View>
         </PageScrollViewHolderComponent>

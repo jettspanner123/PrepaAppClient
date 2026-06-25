@@ -17,6 +17,7 @@ import OnboardingScreenOptions from "./Models/OnboardingScreenOptions";
 const FIRST_SCREEN = OnboardingScreenOptions.INITIAL_SCREEN;
 const LAST_SCREEN = OnboardingScreenOptions.SAVE_SCREEN;
 const SCREEN_WIDTH = Dimensions.get("window").width;
+const VALID_DELAY = 500;
 const SCREENS = [
     FIRST_SCREEN,
     OnboardingScreenOptions.BASIC_INFORMATION,
@@ -25,7 +26,6 @@ const SCREENS = [
     LAST_SCREEN,
 ];
 
-// ─── Error shape per screen ───────────────────────────────────────────────────
 interface BasicInfoErrors {
     name?: boolean;
     courseName?: boolean;
@@ -53,6 +53,10 @@ export default function OnboardingScreenController(): React.JSX.Element {
     );
     const [dateInfoErrors, setDateInfoErrors] = useState<DateInfoErrors>({});
 
+    const [basicAllValid, setBasicAllValid] = useState<boolean>(false);
+    const [courseAllValid, setCourseAllValid] = useState<boolean>(false);
+    const [dateAllValid, setDateAllValid] = useState<boolean>(false);
+
     useEffect(() => {
         scrollRef.current?.scrollTo({
             x: currentScreen * SCREEN_WIDTH,
@@ -71,8 +75,9 @@ export default function OnboardingScreenController(): React.JSX.Element {
         if (hasErrors) {
             setBasicInfoErrors(errors);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            return false;
         }
-        return !hasErrors;
+        return true;
     }, [basicInfo]);
 
     const validateCourseInfo = useCallback((): boolean => {
@@ -84,8 +89,9 @@ export default function OnboardingScreenController(): React.JSX.Element {
         if (hasErrors) {
             setCourseInfoErrors(errors);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            return false;
         }
-        return !hasErrors;
+        return true;
     }, [courseInfo]);
 
     const validateDateInfo = useCallback((): boolean => {
@@ -97,8 +103,9 @@ export default function OnboardingScreenController(): React.JSX.Element {
         if (hasErrors) {
             setDateInfoErrors(errors);
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            return false;
         }
-        return !hasErrors;
+        return true;
     }, [dateInfo]);
 
     // ─── Navigation ───────────────────────────────────────────────────────────
@@ -106,15 +113,36 @@ export default function OnboardingScreenController(): React.JSX.Element {
         if (currentScreen === OnboardingScreenOptions.BASIC_INFORMATION) {
             if (!validateBasicInfo()) return;
             setBasicInfoErrors({});
+            setBasicAllValid(true);
+            setTimeout(() => {
+                setBasicAllValid(false);
+                setCurrentScreen(currentScreen + 1);
+            }, VALID_DELAY);
+            return;
         }
+
         if (currentScreen === OnboardingScreenOptions.COURSE_INFORMATION) {
             if (!validateCourseInfo()) return;
             setCourseInfoErrors({});
+            setCourseAllValid(true);
+            setTimeout(() => {
+                setCourseAllValid(false);
+                setCurrentScreen(currentScreen + 1);
+            }, VALID_DELAY);
+            return;
         }
+
         if (currentScreen === OnboardingScreenOptions.DATE_INFORMATION) {
             if (!validateDateInfo()) return;
             setDateInfoErrors({});
+            setDateAllValid(true);
+            setTimeout(() => {
+                setDateAllValid(false);
+                setCurrentScreen(currentScreen + 1);
+            }, VALID_DELAY);
+            return;
         }
+
         if (currentScreen < LAST_SCREEN) {
             setCurrentScreen(currentScreen + 1);
         }
@@ -157,18 +185,21 @@ export default function OnboardingScreenController(): React.JSX.Element {
                             OnboardingScreenOptions.BASIC_INFORMATION && (
                             <OnboardingScreenBasicInformationViewComponent
                                 errors={basicInfoErrors}
+                                allValid={basicAllValid}
                             />
                         )}
                         {screen ===
                             OnboardingScreenOptions.COURSE_INFORMATION && (
                             <OnboardingScreenCourseInformationViewComponent
                                 errors={courseInfoErrors}
+                                allValid={courseAllValid}
                             />
                         )}
                         {screen ===
                             OnboardingScreenOptions.DATE_INFORMATION && (
                             <OnboardingScreenDateInformationViewComponent
                                 errors={dateInfoErrors}
+                                allValid={dateAllValid}
                             />
                         )}
                         {screen === OnboardingScreenOptions.SAVE_SCREEN && (

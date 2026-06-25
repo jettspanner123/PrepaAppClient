@@ -88,6 +88,7 @@ interface StandardDateInputComponentProps {
     fromYear?: number;
     toYear?: number;
     hasError?: boolean;
+    isValid?: boolean;
 }
 
 export default function StandardDateInputComponent({
@@ -100,6 +101,7 @@ export default function StandardDateInputComponent({
     fromYear = DEFAULT_FROM_YEAR,
     toYear = DEFAULT_TO_YEAR,
     hasError = false,
+    isValid = false,
 }: StandardDateInputComponentProps): React.JSX.Element {
     const years: number[] = Array.from(
         { length: toYear - fromYear + 1 },
@@ -221,9 +223,11 @@ export default function StandardDateInputComponent({
                 style={{
                     fontSize: 11,
                     fontWeight: "600",
-                    color: hasError
-                        ? ColorFactoryCON.DANGER
-                        : ColorFactoryCON.MUTE,
+                    color: isValid
+                        ? ColorFactoryCON.SUCCESS
+                        : hasError
+                          ? ColorFactoryCON.DANGER
+                          : ColorFactoryCON.MUTE,
                     textTransform: "uppercase",
                     letterSpacing: 1.5,
                     marginBottom: 5,
@@ -245,11 +249,13 @@ export default function StandardDateInputComponent({
                         backgroundColor: ColorFactoryCON.INPUT_BG,
                         borderRadius: EdgeInsetsCON.MD,
                         borderWidth: 1,
-                        borderColor: hasError
-                            ? ColorFactoryCON.DANGER
-                            : open
-                              ? ColorFactoryCON.WHITE
-                              : ColorFactoryCON.CARD_BORDER,
+                        borderColor: isValid
+                            ? ColorFactoryCON.SUCCESS
+                            : hasError
+                              ? ColorFactoryCON.DANGER
+                              : open
+                                ? ColorFactoryCON.WHITE
+                                : ColorFactoryCON.CARD_BORDER,
                         paddingHorizontal: EdgeInsetsCON.LG,
                         paddingVertical: EdgeInsetsCON.LG,
                         flexDirection: "row",

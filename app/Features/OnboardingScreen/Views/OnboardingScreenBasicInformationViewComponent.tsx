@@ -8,10 +8,12 @@ import { Text, View } from "react-native";
 
 interface OnboardingScreenBasicInformationViewComponentProps {
     errors?: { name?: boolean; courseName?: boolean; profileName?: boolean };
+    allValid?: boolean;
 }
 
 export default function OnboardingScreenBasicInformationViewComponent({
     errors = {},
+    allValid = false,
 }: OnboardingScreenBasicInformationViewComponentProps): React.JSX.Element {
     const { basicInfo, setBasicInfo } = useOnboardingStateStore();
 
@@ -33,6 +35,7 @@ export default function OnboardingScreenBasicInformationViewComponent({
                     onChangeText={(text) => setBasicInfo({ name: text })}
                     placeholder={OnboardingScreenCON.PLACEHOLDER_NAME}
                     hasError={errors.name}
+                    isValid={allValid}
                 />
                 <StandardInputComponent
                     label={OnboardingScreenCON.LABEL_COURSE_NAME}
@@ -41,6 +44,7 @@ export default function OnboardingScreenBasicInformationViewComponent({
                     placeholder={OnboardingScreenCON.PLACEHOLDER_COURSE_NAME}
                     labelClassName="mt-5"
                     hasError={errors.courseName}
+                    isValid={allValid}
                 />
                 <StandardInputComponent
                     label={OnboardingScreenCON.LABEL_PROFILE_NAME}
@@ -49,6 +53,7 @@ export default function OnboardingScreenBasicInformationViewComponent({
                     placeholder={OnboardingScreenCON.PLACEHOLDER_PROFILE_NAME}
                     labelClassName="mt-5"
                     hasError={errors.profileName}
+                    isValid={allValid}
                 />
             </View>
         </PageScrollViewHolderComponent>
