@@ -1,6 +1,7 @@
-import OnboardingScreenController from "./Features/OnboardingScreen/OnboardingScreenController";
+import AuthenticationScreenController from "./Features/AuthenticationScreen/AuthenticationScreenController";
 
 export default function RootScreenController() {
     // return <ProfileSelectionScreenController />;
-    return <OnboardingScreenController />;
+    // return <OnboardingScreenController />;
+    return <AuthenticationScreenController />;
 }
