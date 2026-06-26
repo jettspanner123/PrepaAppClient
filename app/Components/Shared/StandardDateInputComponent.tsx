@@ -300,6 +300,41 @@ export default function StandardDateInputComponent({
                         onPress={handleCancel}
                     />
 
+                    {/* Floating pill heading */}
+                    <Animated.View
+                        style={{
+                            transform: [{ translateY: cardTranslateY }],
+                            marginHorizontal: EdgeInsetsCON.SCREEN_H,
+                            alignSelf: "stretch",
+                            marginBottom: EdgeInsetsCON.SM,
+                        }}
+                    >
+                        <View
+                            style={{
+                                alignSelf: "flex-start",
+                                backgroundColor:
+                                    ColorFactoryCON.CARD_BG_LIGHT_PRESSED,
+                                borderRadius: 9999,
+                                borderWidth: 1,
+                                borderColor: ColorFactoryCON.CARD_BORDER,
+                                paddingVertical: EdgeInsetsCON.XS,
+                                paddingHorizontal: EdgeInsetsCON.LG,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: 12,
+                                    fontWeight: "600",
+                                    color: ColorFactoryCON.MUTE,
+                                    textTransform: "uppercase",
+                                    letterSpacing: 1.5,
+                                }}
+                            >
+                                {label}
+                            </Text>
+                        </View>
+                    </Animated.View>
+
                     <Animated.View
                         style={{
                             transform: [{ translateY: cardTranslateY }],
@@ -312,29 +347,6 @@ export default function StandardDateInputComponent({
                             overflow: "hidden",
                         }}
                     >
-                        {/* Title */}
-                        <View
-                            style={{
-                                paddingHorizontal: EdgeInsetsCON.XL,
-                                paddingTop: EdgeInsetsCON.XL,
-                                paddingBottom: EdgeInsetsCON.MD,
-                                borderBottomWidth: 1,
-                                borderBottomColor: ColorFactoryCON.CARD_BORDER,
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    fontSize: 11,
-                                    fontWeight: "600",
-                                    color: ColorFactoryCON.MUTE,
-                                    textTransform: "uppercase",
-                                    letterSpacing: 1.5,
-                                }}
-                            >
-                                {label}
-                            </Text>
-                        </View>
-
                         {/* Year scroll list */}
                         <View style={{ height: ITEM_HEIGHT * 5 }}>
                             {/* Selection highlight strip */}

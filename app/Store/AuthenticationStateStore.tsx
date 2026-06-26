@@ -8,12 +8,11 @@ const useAuthenticationStateStore = create<AuthenticationStateStoreInterface>(
         setCurrentScreen: (screen: AuthenticationScreenOptions) =>
             set({ currentScreen: screen }),
 
-        loginPhone: "",
-        setLoginPhone: (phone: string) => set({ loginPhone: phone }),
+        phoneNumber: "",
+        setPhoneNumber: (phone: string) => set({ phoneNumber: phone }),
 
-        registrationPhone: "",
-        setRegistrationPhone: (phone: string) =>
-            set({ registrationPhone: phone }),
+        email: "",
+        setEmail: (email: string) => set({ email }),
 
         registrationFullName: "",
         setRegistrationFullName: (name: string) =>

@@ -10,6 +10,10 @@ export default class AuthenticationScreenCON {
     public static readonly LABEL_PHONE: string = "Phone Number";
     public static readonly PLACEHOLDER_PHONE: string = "e.g. 9876543210";
     public static readonly SEND_OTP_LABEL: string = "Send OTP";
+    public static readonly GOOGLE_LOGIN_LABEL: string = "Login with Google";
+
+    public static readonly LABEL_EMAIL: string = "Email Address";
+    public static readonly PLACEHOLDER_EMAIL: string = "e.g. you@example.com";
 
     public static readonly LABEL_FULL_NAME: string = "Full Name";
     public static readonly PLACEHOLDER_FULL_NAME: string =

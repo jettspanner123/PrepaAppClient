@@ -1,16 +1,21 @@
+import StandardButtonComponent, {
+    StandardButtonComponentVariant,
+} from "@/app/Components/Shared/StandardButtonComponent";
 import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import AuthenticationScreenCON from "@/app/Features/AuthenticationScreen/Constants/AuthenticationScreenCON";
 import * as Haptics from "expo-haptics";
 import React, { useRef } from "react";
-import { Animated, Pressable, Text } from "react-native";
+import { Animated, Pressable, Text, View } from "react-native";
 
 interface AuthenticationScreenFABStaticComponentProps {
     onPress: () => void;
+    onGooglePress: () => void;
 }
 
 export default function AuthenticationScreenFABStaticComponent({
     onPress,
+    onGooglePress,
 }: AuthenticationScreenFABStaticComponentProps): React.JSX.Element {
     const anim = useRef(new Animated.Value(0)).current;
 
@@ -41,38 +46,51 @@ export default function AuthenticationScreenFABStaticComponent({
     });
 
     return (
-        <Pressable
-            onPress={handlePress}
-            onPressIn={handlePressIn}
-            onPressOut={handlePressOut}
+        <View
             style={{
                 position: "absolute",
                 bottom: EdgeInsetsCON.FAB_BOTTOM,
                 left: EdgeInsetsCON.SCREEN_H,
                 right: EdgeInsetsCON.SCREEN_H,
+                gap: EdgeInsetsCON.LG,
             }}
         >
-            <Animated.View
-                style={{
-                    backgroundColor,
-                    borderRadius: 9999,
-                    borderWidth: 1,
-                    borderColor: ColorFactoryCON.CARD_BORDER,
-                    paddingVertical: EdgeInsetsCON.LG,
-                    alignItems: "center",
-                    justifyContent: "center",
-                }}
+            {/* Send OTP — white primary */}
+            <Pressable
+                onPress={handlePress}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
             >
-                <Text
+                <Animated.View
                     style={{
-                        fontSize: 16,
-                        fontWeight: "600",
-                        color: ColorFactoryCON.INK,
+                        backgroundColor,
+                        borderRadius: 9999,
+                        borderWidth: 1,
+                        borderColor: ColorFactoryCON.CARD_BORDER,
+                        paddingVertical: EdgeInsetsCON.LG,
+                        alignItems: "center",
+                        justifyContent: "center",
                     }}
                 >
-                    {AuthenticationScreenCON.SEND_OTP_LABEL}
-                </Text>
-            </Animated.View>
-        </Pressable>
+                    <Text
+                        style={{
+                            fontSize: 16,
+                            fontWeight: "600",
+                            color: ColorFactoryCON.INK,
+                        }}
+                    >
+                        {AuthenticationScreenCON.SEND_OTP_LABEL}
+                    </Text>
+                </Animated.View>
+            </Pressable>
+
+            {/* Login with Google — dark secondary */}
+            <StandardButtonComponent
+                label={AuthenticationScreenCON.GOOGLE_LOGIN_LABEL}
+                onPress={onGooglePress}
+                variant={StandardButtonComponentVariant.DARK}
+                fullWidth
+            />
+        </View>
     );
 }

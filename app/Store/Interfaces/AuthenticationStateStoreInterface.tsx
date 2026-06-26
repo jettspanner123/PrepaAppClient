@@ -4,11 +4,11 @@ export default interface AuthenticationStateStoreInterface {
     currentScreen: AuthenticationScreenOptions;
     setCurrentScreen: (screen: AuthenticationScreenOptions) => void;
 
-    loginPhone: string;
-    setLoginPhone: (phone: string) => void;
+    phoneNumber: string;
+    setPhoneNumber: (phone: string) => void;
 
-    registrationPhone: string;
-    setRegistrationPhone: (phone: string) => void;
+    email: string;
+    setEmail: (email: string) => void;
 
     registrationFullName: string;
     setRegistrationFullName: (name: string) => void;

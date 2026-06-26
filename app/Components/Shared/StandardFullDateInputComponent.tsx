@@ -12,6 +12,9 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import StandardButtonComponent, {
+    StandardButtonComponentVariant,
+} from "./StandardButtonComponent";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const CURRENT_YEAR = new Date().getFullYear();
@@ -413,6 +416,42 @@ export default function StandardFullDateInputComponent({
                         onPress={handleCancel}
                     />
 
+                    {/* Floating pill heading */}
+                    <Animated.View
+                        style={{
+                            transform: [{ translateY: cardTranslateY }],
+                            marginHorizontal: EdgeInsetsCON.SCREEN_H,
+                            alignSelf: "stretch",
+                            marginBottom: EdgeInsetsCON.SM,
+                        }}
+                    >
+                        <View
+                            style={{
+                                alignSelf: "flex-start",
+                                backgroundColor:
+                                    ColorFactoryCON.CARD_BG_LIGHT_PRESSED,
+                                borderRadius: 9999,
+                                borderWidth: 1,
+                                borderColor: ColorFactoryCON.CARD_BORDER,
+                                paddingVertical: EdgeInsetsCON.XS,
+                                paddingHorizontal: EdgeInsetsCON.LG,
+                            }}
+                        >
+                            <Text
+                                style={{
+                                    fontSize: 12,
+                                    fontWeight: "600",
+                                    color: ColorFactoryCON.MUTE,
+                                    textTransform: "uppercase",
+                                    letterSpacing: 1.5,
+                                }}
+                            >
+                                {label}
+                            </Text>
+                        </View>
+                    </Animated.View>
+
+                    {/* Card */}
                     <Animated.View
                         style={{
                             transform: [{ translateY: cardTranslateY }],
@@ -425,29 +464,6 @@ export default function StandardFullDateInputComponent({
                             overflow: "hidden",
                         }}
                     >
-                        {/* Title */}
-                        <View
-                            style={{
-                                paddingHorizontal: EdgeInsetsCON.XL,
-                                paddingTop: EdgeInsetsCON.XL,
-                                paddingBottom: EdgeInsetsCON.MD,
-                                borderBottomWidth: 1,
-                                borderBottomColor: ColorFactoryCON.CARD_BORDER,
-                            }}
-                        >
-                            <Text
-                                style={{
-                                    fontSize: 11,
-                                    fontWeight: "600",
-                                    color: ColorFactoryCON.MUTE,
-                                    textTransform: "uppercase",
-                                    letterSpacing: 1.5,
-                                }}
-                            >
-                                {label}
-                            </Text>
-                        </View>
-
                         {/* Three wheels */}
                         <View
                             style={{
@@ -455,7 +471,6 @@ export default function StandardFullDateInputComponent({
                                 height: ITEM_HEIGHT * 5,
                             }}
                         >
-                            {/* Shared highlight strip */}
                             <View
                                 pointerEvents="none"
                                 style={{
@@ -471,8 +486,6 @@ export default function StandardFullDateInputComponent({
                                     borderColor: ColorFactoryCON.CARD_BORDER,
                                 }}
                             />
-
-                            {/* Day */}
                             <WheelColumn
                                 data={days}
                                 hoveredIndex={hoveredDay}
@@ -485,8 +498,6 @@ export default function StandardFullDateInputComponent({
                                     }));
                                 }}
                             />
-
-                            {/* Divider */}
                             <View
                                 style={{
                                     width: 1,
@@ -495,8 +506,6 @@ export default function StandardFullDateInputComponent({
                                     marginVertical: EdgeInsetsCON.SM,
                                 }}
                             />
-
-                            {/* Month */}
                             <WheelColumn
                                 data={MONTHS}
                                 hoveredIndex={hoveredMonth}
@@ -509,8 +518,6 @@ export default function StandardFullDateInputComponent({
                                     }));
                                 }}
                             />
-
-                            {/* Divider */}
                             <View
                                 style={{
                                     width: 1,
@@ -519,8 +526,6 @@ export default function StandardFullDateInputComponent({
                                     marginVertical: EdgeInsetsCON.SM,
                                 }}
                             />
-
-                            {/* Year */}
                             <WheelColumn
                                 data={years}
                                 hoveredIndex={hoveredYear}
@@ -534,69 +539,33 @@ export default function StandardFullDateInputComponent({
                                 }}
                             />
                         </View>
+                    </Animated.View>
 
-                        {/* Actions */}
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                borderTopWidth: 1,
-                                borderTopColor: ColorFactoryCON.CARD_BORDER,
-                            }}
-                        >
-                            <Pressable
-                                onPressIn={() =>
-                                    Haptics.impactAsync(
-                                        Haptics.ImpactFeedbackStyle.Light,
-                                    )
-                                }
-                                onPress={handleCancel}
-                                style={{
-                                    flex: 1,
-                                    paddingVertical: EdgeInsetsCON.LG,
-                                    alignItems: "center",
-                                    backgroundColor:
-                                        ColorFactoryCON.DANGER_MUTED,
-                                    borderRightWidth: 1,
-                                    borderRightColor:
-                                        ColorFactoryCON.CARD_BORDER,
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        fontSize: 16,
-                                        fontWeight: "500",
-                                        color: ColorFactoryCON.DANGER,
-                                    }}
-                                >
-                                    Cancel
-                                </Text>
-                            </Pressable>
-                            <Pressable
-                                onPressIn={() =>
-                                    Haptics.impactAsync(
-                                        Haptics.ImpactFeedbackStyle.Medium,
-                                    )
-                                }
-                                onPress={handleConfirm}
-                                style={{
-                                    flex: 1,
-                                    paddingVertical: EdgeInsetsCON.LG,
-                                    alignItems: "center",
-                                    backgroundColor:
-                                        ColorFactoryCON.CARD_BG_LIGHT_PRESSED,
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        fontSize: 16,
-                                        fontWeight: "600",
-                                        color: ColorFactoryCON.WHITE,
-                                    }}
-                                >
-                                    Confirm
-                                </Text>
-                            </Pressable>
-                        </View>
+                    {/* Floating buttons */}
+                    <Animated.View
+                        style={{
+                            transform: [{ translateY: cardTranslateY }],
+                            flexDirection: "row",
+                            marginHorizontal: EdgeInsetsCON.SCREEN_H,
+                            alignSelf: "stretch",
+                            gap: EdgeInsetsCON.SM,
+                            marginTop: EdgeInsetsCON.SM,
+                        }}
+                    >
+                        <StandardButtonComponent
+                            label="Cancel"
+                            onPress={handleCancel}
+                            variant={StandardButtonComponentVariant.DARK}
+                            style={{ flex: 1 }}
+                            hapticStyle={Haptics.ImpactFeedbackStyle.Light}
+                        />
+                        <StandardButtonComponent
+                            label="Confirm"
+                            onPress={handleConfirm}
+                            variant={StandardButtonComponentVariant.WHITE}
+                            style={{ flex: 1 }}
+                            hapticStyle={Haptics.ImpactFeedbackStyle.Medium}
+                        />
                     </Animated.View>
                 </Animated.View>
             </Modal>
