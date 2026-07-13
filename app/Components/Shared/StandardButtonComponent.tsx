@@ -10,6 +10,8 @@ export enum StandardButtonComponentVariant {
     WHITE = "WHITE",
     /** Dark background with border, white text — secondary/ghost style */
     DARK = "DARK",
+    /** Red background with white text — destructive action */
+    DANGER = "DANGER",
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -74,18 +76,39 @@ export default function StandardButtonComponent({
 
     // ─── Default colors per variant ───────────────────────────────────
     const isWhite = variant === StandardButtonComponentVariant.WHITE;
+    const isDanger = variant === StandardButtonComponentVariant.DANGER;
 
-    const resolvedBg = backgroundColor
-        ?? (isWhite ? ColorFactoryCON.WHITE : ColorFactoryCON.CARD_BG_LIGHT_PRESSED);
+    const resolvedBg =
+        backgroundColor ??
+        (isWhite
+            ? ColorFactoryCON.WHITE
+            : isDanger
+              ? ColorFactoryCON.DANGER_MUTED
+              : ColorFactoryCON.CARD_BG_LIGHT_PRESSED);
 
-    const resolvedPressedBg = pressedBackgroundColor
-        ?? (isWhite ? ColorFactoryCON.HAIRLINE : ColorFactoryCON.CARD_BG_LIGHT);
+    const resolvedPressedBg =
+        pressedBackgroundColor ??
+        (isWhite
+            ? ColorFactoryCON.HAIRLINE
+            : isDanger
+              ? ColorFactoryCON.DANGER
+              : ColorFactoryCON.CARD_BG_LIGHT);
 
-    const resolvedTextColor = textColor
-        ?? (isWhite ? ColorFactoryCON.INK : ColorFactoryCON.WHITE);
+    const resolvedTextColor =
+        textColor ??
+        (isWhite
+            ? ColorFactoryCON.INK
+            : isDanger
+              ? ColorFactoryCON.DANGER
+              : ColorFactoryCON.WHITE);
 
-    const resolvedBorderColor = borderColor
-        ?? (isWhite ? ColorFactoryCON.HAIRLINE : ColorFactoryCON.CARD_BORDER);
+    const resolvedBorderColor =
+        borderColor ??
+        (isWhite
+            ? ColorFactoryCON.HAIRLINE
+            : isDanger
+              ? ColorFactoryCON.DANGER
+              : ColorFactoryCON.CARD_BORDER);
 
     const handlePressIn = (): void => setPressed(true);
     const handlePressOut = (): void => setPressed(false);

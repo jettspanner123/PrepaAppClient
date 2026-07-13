@@ -1,0 +1,600 @@
+<!doctype html>
+<html class="dark" lang="en" style="">
+    <head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+        <title>FORGE - Workout Session</title>
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Hanken+Grotesk:wght@400;700&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+            rel="stylesheet"
+        />
+        <script id="tailwind-config">
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        colors: {
+                            "on-tertiary-container": "#636565",
+                            "surface-container-high": "#2a2a2a",
+                            "on-primary-fixed-variant": "#454747",
+                            outline: "#8e9192",
+                            "secondary-container": "#474747",
+                            "tertiary-fixed": "#e2e2e2",
+                            tertiary: "#ffffff",
+                            "tertiary-container": "#e2e2e2",
+                            "primary-container": "#e2e2e2",
+                            "on-tertiary-fixed": "#1a1c1c",
+                            secondary: "#c6c6c6",
+                            primary: "#ffffff",
+                            "on-primary-fixed": "#1a1c1c",
+                            "secondary-fixed": "#e2e2e2",
+                            "on-surface-variant": "#c4c7c8",
+                            "on-primary-container": "#636565",
+                            "secondary-fixed-dim": "#c6c6c6",
+                            "on-tertiary": "#2f3131",
+                            "surface-container": "#20201f",
+                            "outline-variant": "#444748",
+                            "inverse-on-surface": "#313030",
+                            "surface-variant": "#353535",
+                            "on-secondary-fixed": "#1b1b1b",
+                            "on-secondary": "#303030",
+                            "on-error-container": "#ffdad6",
+                            "inverse-primary": "#5d5f5f",
+                            "surface-dim": "#131313",
+                            background: "#131313",
+                            "tertiary-fixed-dim": "#c6c6c7",
+                            "surface-tint": "#c6c6c7",
+                            "on-error": "#690005",
+                            "surface-container-lowest": "#0e0e0e",
+                            "surface-container-highest": "#353535",
+                            "on-primary": "#2f3131",
+                            "surface-container-low": "#1c1b1b",
+                            "primary-fixed": "#e2e2e2",
+                            "primary-fixed-dim": "#c6c6c7",
+                            "on-tertiary-fixed-variant": "#454747",
+                            "on-background": "#e5e2e1",
+                            surface: "#131313",
+                            "on-secondary-container": "#b5b5b5",
+                            "inverse-surface": "#e5e2e1",
+                            "error-container": "#93000a",
+                            error: "#ffb4ab",
+                            "on-secondary-fixed-variant": "#474747",
+                            "on-surface": "#e5e2e1",
+                            "surface-bright": "#393939",
+                        },
+                        borderRadius: {
+                            DEFAULT: "0.25rem",
+                            lg: "0.5rem",
+                            xl: "0.75rem",
+                            full: "9999px",
+                        },
+                        spacing: {
+                            "stack-sm": "8px",
+                            unit: "4px",
+                            "container-max": "1440px",
+                            "stack-lg": "48px",
+                            "stack-md": "24px",
+                            gutter: "24px",
+                            "margin-mobile": "20px",
+                            "margin-desktop": "64px",
+                            "stack-xl": "80px",
+                        },
+                        fontFamily: {
+                            "label-caps": ["JetBrains Mono"],
+                            "body-lg": ["Hanken Grotesk"],
+                            "headline-md": ["Anton"],
+                            "body-md": ["Hanken Grotesk"],
+                            "headline-lg": ["Anton"],
+                            "display-lg-mobile": ["Anton"],
+                            "display-lg": ["Anton"],
+                        },
+                        fontSize: {
+                            "label-caps": [
+                                "12px",
+                                {
+                                    lineHeight: "16px",
+                                    letterSpacing: "0.1em",
+                                    fontWeight: "700",
+                                },
+                            ],
+                            "body-lg": [
+                                "18px",
+                                {
+                                    lineHeight: "28px",
+                                    letterSpacing: "0em",
+                                    fontWeight: "400",
+                                },
+                            ],
+                            "headline-md": [
+                                "32px",
+                                {
+                                    lineHeight: "36px",
+                                    letterSpacing: "0.02em",
+                                    fontWeight: "400",
+                                },
+                            ],
+                            "body-md": [
+                                "16px",
+                                {
+                                    lineHeight: "24px",
+                                    letterSpacing: "0em",
+                                    fontWeight: "400",
+                                },
+                            ],
+                            "headline-lg": [
+                                "40px",
+                                {
+                                    lineHeight: "48px",
+                                    letterSpacing: "0.02em",
+                                    fontWeight: "400",
+                                },
+                            ],
+                            "display-lg-mobile": [
+                                "48px",
+                                {
+                                    lineHeight: "44px",
+                                    letterSpacing: "-0.02em",
+                                    fontWeight: "400",
+                                },
+                            ],
+                            "display-lg": [
+                                "96px",
+                                {
+                                    lineHeight: "90px",
+                                    letterSpacing: "-0.04em",
+                                    fontWeight: "400",
+                                },
+                            ],
+                        },
+                    },
+                },
+            };
+        </script>
+        <style>
+            /* Kinetic Minimalism Resets & Custom Styles */
+            body {
+                background-color: #000000; /* Force true black background as per Layer 0 */
+                color: #ffffff;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                overflow-x: hidden;
+            }
+
+            .kinetic-input {
+                background: transparent;
+                border: none;
+                border-bottom: 2px solid #ffffff;
+                color: #ffffff;
+                font-family: "JetBrains Mono", monospace;
+                padding: 8px 4px;
+                width: 100%;
+                transition: all 150ms ease-out;
+            }
+
+            .kinetic-input:focus {
+                outline: none;
+                border-bottom: 2px solid #ffffff;
+                background: rgba(255, 255, 255, 0.05);
+            }
+
+            .kinetic-input::placeholder {
+                color: #666666;
+            }
+
+            .exercise-card {
+                border: 1px solid #333333;
+                transition: all 150ms ease-out;
+            }
+
+            .exercise-card:hover {
+                border: 2px solid #ffffff;
+            }
+
+            .kinetic-btn-primary {
+                background: #ffffff;
+                color: #000000;
+                font-family: "Anton", sans-serif;
+                text-transform: uppercase;
+                transition: all 150ms ease-out;
+            }
+
+            .kinetic-btn-primary:active {
+                transform: scale(0.98);
+            }
+
+            .kinetic-btn-secondary {
+                background: transparent;
+                color: #ffffff;
+                border: 2px solid #ffffff;
+                font-family: "Anton", sans-serif;
+                text-transform: uppercase;
+                transition: all 150ms ease-out;
+            }
+
+            .kinetic-btn-secondary:hover {
+                background: #ffffff;
+                color: #000000;
+            }
+
+            .kinetic-btn-secondary:active {
+                transform: scale(0.98);
+            }
+
+            /* Timer pulse effect */
+            @keyframes pulse-opacity {
+                0%,
+                100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.5;
+                }
+            }
+            .timer-colon {
+                animation: pulse-opacity 1s infinite;
+            }
+
+            /* Hide TopNav on Desktop as this is a focused session screen */
+            /* Hiding bottom nav per semantic mapping rule for transactional/focused tasks (workout session) */
+        </style>
+        <style>
+            body {
+                min-height: max(884px, 100dvh);
+            }
+        </style>
+    </head>
+    <body class="bg-background text-on-surface antialiased min-h-screen pb-32">
+        <!-- TopAppBar (Web) - Hidden for focused session but kept structurally available -->
+        <header
+            class="hidden md:flex flex items-center justify-between px-margin-desktop h-16 w-full z-50 fixed top-0 w-full bg-surface/80 backdrop-blur-lg border-b border-white/10 shadow-none"
+        >
+            <div class="flex items-center gap-4">
+                <button
+                    class="text-primary hover:opacity-80 transition-opacity active:scale-95 transition-transform"
+                >
+                    <span class="material-symbols-outlined text-2xl"
+                        >arrow_back</span
+                    >
+                </button>
+                <h1
+                    class="font-headline-md text-headline-md text-primary tracking-tighter"
+                >
+                    FORGE
+                </h1>
+            </div>
+            <div class="flex items-center gap-6">
+                <!-- Nav hidden to focus on session -->
+                <button
+                    class="text-primary hover:opacity-80 transition-opacity"
+                >
+                    <span class="material-symbols-outlined text-3xl"
+                        >close</span
+                    >
+                </button>
+            </div>
+        </header>
+        <!-- Main Content Canvas -->
+        <main
+            class="w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-8 md:pt-32 flex flex-col min-h-screen"
+        >
+            <!-- Header Section: Title & Timer -->
+            <section
+                class="mb-stack-lg flex flex-col md:flex-row md:justify-between md:items-end gap-stack-md border-b border-[#333333] pb-stack-md"
+            >
+                <div>
+                    <span
+                        class="inline-block bg-primary text-on-primary font-label-caps text-label-caps px-3 py-1 mb-stack-sm uppercase"
+                        >Active Session</span
+                    >
+                    <h1
+                        class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary uppercase leading-none tracking-tighter"
+                    >
+                        Back &amp; Shoulders<br /><span class="text-secondary"
+                            >Power V</span
+                        >
+                    </h1>
+                </div>
+                <div class="flex flex-col items-start md:items-end">
+                    <span
+                        class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-unit"
+                        >Elapsed Time</span
+                    >
+                    <div
+                        class="font-label-caps text-4xl md:text-5xl font-bold tracking-widest text-primary flex items-center"
+                        id="workout-timer"
+                    >
+                        00<span class="timer-colon">:</span>16<span
+                            class="timer-colon"
+                            >:</span
+                        >10
+                    </div>
+                </div>
+            </section>
+            <!-- Exercises List -->
+            <section class="flex-grow flex flex-col gap-stack-md pb-stack-xl">
+                <!-- Exercise 1: Deadlift -->
+                <div class="exercise-card p-6 flex flex-col gap-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span
+                                class="font-label-caps text-label-caps text-on-surface-variant uppercase block mb-1"
+                                >01 / Main Lift</span
+                            >
+                            <h2
+                                class="font-headline-md text-headline-md text-primary uppercase"
+                            >
+                                Deadlift
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <!-- Set 1 -->
+                        <div
+                            class="flex items-center justify-between gap-4 p-4 border border-[#333333] bg-[#111111]"
+                        >
+                            <div class="w-16">
+                                <span
+                                    class="font-label-caps text-label-caps text-on-surface-variant block"
+                                    >Set</span
+                                >
+                                <span class="font-label-caps text-lg font-bold"
+                                    >1/4</span
+                                >
+                            </div>
+                            <div class="flex-1 flex gap-4 items-end">
+                                <div class="flex-1">
+                                    <span
+                                        class="font-label-caps text-label-caps text-on-surface-variant block mb-1"
+                                        >LBS</span
+                                    >
+                                    <input
+                                        class="kinetic-input text-xl"
+                                        placeholder="225"
+                                        type="number"
+                                        value="315"
+                                    />
+                                </div>
+                                <div class="flex-1">
+                                    <span
+                                        class="font-label-caps text-label-caps text-on-surface-variant block mb-1"
+                                        >Reps</span
+                                    >
+                                    <input
+                                        class="kinetic-input text-xl"
+                                        placeholder="5"
+                                        type="number"
+                                        value="5"
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                class="w-12 h-12 flex items-center justify-center bg-primary text-on-primary hover:opacity-80 transition-opacity active:scale-90 ml-2"
+                            >
+                                <span
+                                    class="material-symbols-outlined"
+                                    style="
+                                        font-variation-settings: &quot;FILL&quot;
+                                            1;
+                                    "
+                                    >check</span
+                                >
+                            </button>
+                        </div>
+                        <!-- Set 2 -->
+                        <div
+                            class="flex items-center justify-between gap-4 p-4 border border-[#333333]"
+                        >
+                            <div class="w-16">
+                                <span
+                                    class="font-label-caps text-label-caps text-on-surface-variant block"
+                                    >Set</span
+                                >
+                                <span class="font-label-caps text-lg font-bold"
+                                    >2/4</span
+                                >
+                            </div>
+                            <div class="flex-1 flex gap-4 items-end">
+                                <div class="flex-1">
+                                    <span
+                                        class="font-label-caps text-label-caps text-on-surface-variant block mb-1"
+                                        >LBS</span
+                                    >
+                                    <input
+                                        class="kinetic-input text-xl"
+                                        placeholder="315"
+                                        type="number"
+                                    />
+                                </div>
+                                <div class="flex-1">
+                                    <span
+                                        class="font-label-caps text-label-caps text-on-surface-variant block mb-1"
+                                        >Reps</span
+                                    >
+                                    <input
+                                        class="kinetic-input text-xl"
+                                        placeholder="5"
+                                        type="number"
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                class="kinetic-btn-secondary w-12 h-12 flex items-center justify-center"
+                            >
+                                <span class="material-symbols-outlined"
+                                    >check</span
+                                >
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Exercise 2: Overhead Press -->
+                <div class="exercise-card p-6 flex flex-col gap-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span
+                                class="font-label-caps text-label-caps text-on-surface-variant uppercase block mb-1"
+                                >02 / Secondary Lift</span
+                            >
+                            <h2
+                                class="font-headline-md text-headline-md text-primary uppercase"
+                            >
+                                Overhead Press
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <!-- Set 1 -->
+                        <div
+                            class="flex items-center justify-between gap-4 p-4 border border-[#333333]"
+                        >
+                            <div class="w-16">
+                                <span
+                                    class="font-label-caps text-label-caps text-on-surface-variant block"
+                                    >Set</span
+                                >
+                                <span class="font-label-caps text-lg font-bold"
+                                    >1/4</span
+                                >
+                            </div>
+                            <div class="flex-1 flex gap-4 items-end">
+                                <div class="flex-1">
+                                    <span
+                                        class="font-label-caps text-label-caps text-on-surface-variant block mb-1"
+                                        >LBS</span
+                                    >
+                                    <input
+                                        class="kinetic-input text-xl"
+                                        placeholder="135"
+                                        type="number"
+                                    />
+                                </div>
+                                <div class="flex-1">
+                                    <span
+                                        class="font-label-caps text-label-caps text-on-surface-variant block mb-1"
+                                        >Reps</span
+                                    >
+                                    <input
+                                        class="kinetic-input text-xl"
+                                        placeholder="8"
+                                        type="number"
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                class="kinetic-btn-secondary w-12 h-12 flex items-center justify-center"
+                            >
+                                <span class="material-symbols-outlined"
+                                    >check</span
+                                >
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Exercise 3: Pull-Ups -->
+                <div class="exercise-card p-6 flex flex-col gap-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span
+                                class="font-label-caps text-label-caps text-on-surface-variant uppercase block mb-1"
+                                >03 / Accessory</span
+                            >
+                            <h2
+                                class="font-headline-md text-headline-md text-primary uppercase"
+                            >
+                                Pull-Ups
+                            </h2>
+                        </div>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <!-- Set 1 -->
+                        <div
+                            class="flex items-center justify-between gap-4 p-4 border border-[#333333]"
+                        >
+                            <div class="w-16">
+                                <span
+                                    class="font-label-caps text-label-caps text-on-surface-variant block"
+                                    >Set</span
+                                >
+                                <span class="font-label-caps text-lg font-bold"
+                                    >1/3</span
+                                >
+                            </div>
+                            <div class="flex-1 flex gap-4 items-end">
+                                <div class="flex-1">
+                                    <span
+                                        class="font-label-caps text-label-caps text-on-surface-variant block mb-1"
+                                        >LBS (+/-)</span
+                                    >
+                                    <input
+                                        class="kinetic-input text-xl"
+                                        placeholder="BW"
+                                        type="number"
+                                    />
+                                </div>
+                                <div class="flex-1">
+                                    <span
+                                        class="font-label-caps text-label-caps text-on-surface-variant block mb-1"
+                                        >Reps</span
+                                    >
+                                    <input
+                                        class="kinetic-input text-xl"
+                                        placeholder="AMRAP"
+                                        type="number"
+                                    />
+                                </div>
+                            </div>
+                            <button
+                                class="kinetic-btn-secondary w-12 h-12 flex items-center justify-center"
+                            >
+                                <span class="material-symbols-outlined"
+                                    >check</span
+                                >
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Bottom Action Area - Finish Session -->
+            <div
+                class="fixed bottom-0 left-0 w-full bg-[#000000] border-t border-[#333333] p-4 md:p-6 z-40 flex justify-center pb-8"
+            >
+                <div class="w-full max-w-md mx-auto">
+                    <button
+                        class="kinetic-btn-primary w-full py-4 text-2xl tracking-widest flex items-center justify-center gap-3"
+                    >
+                        FINISH SESSION
+                        <span
+                            class="material-symbols-outlined text-2xl font-bold"
+                            >arrow_forward</span
+                        >
+                    </button>
+                </div>
+            </div>
+        </main>
+        <script>
+            // Simple timer increment script for prototyping
+            let seconds = 942; // 15:42
+            const timerDisplay = document.getElementById("workout-timer");
+
+            setInterval(() => {
+                seconds++;
+                const h = Math.floor(seconds / 3600);
+                const m = Math.floor((seconds % 3600) / 60);
+                const s = seconds % 60;
+
+                const format = (val) => val.toString().padStart(2, "0");
+
+                timerDisplay.innerHTML = `${format(h)}<span class="timer-colon">:</span>${format(m)}<span class="timer-colon">:</span>${format(s)}`;
+            }, 1000);
+        </script>
+    </body>
+</html>

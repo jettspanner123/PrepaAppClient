@@ -11,6 +11,18 @@ const useAdditionalInformationStateStore =
 
         gender: null,
         setGender: (gender) => set({ gender }),
+
+        graduationYear: null,
+        setGraduationYear: (year) => set({ graduationYear: year }),
+
+        collegeName: "",
+        setCollegeName: (name: string) => set({ collegeName: name }),
+
+        currentState: "",
+        setCurrentState: (state: string) => set({ currentState: state }),
+
+        hometownState: "",
+        setHometownState: (state: string) => set({ hometownState: state }),
     }));
 
 export default useAdditionalInformationStateStore;

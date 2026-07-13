@@ -12,6 +12,9 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
+import StandardButtonComponent, {
+    StandardButtonComponentVariant,
+} from "./StandardButtonComponent";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const CURRENT_YEAR = new Date().getFullYear();
@@ -419,69 +422,33 @@ export default function StandardDateInputComponent({
                                 )}
                             />
                         </View>
+                    </Animated.View>
 
-                        {/* Actions */}
-                        <View
-                            style={{
-                                flexDirection: "row",
-                                borderTopWidth: 1,
-                                borderTopColor: ColorFactoryCON.CARD_BORDER,
-                            }}
-                        >
-                            <Pressable
-                                onPressIn={() =>
-                                    Haptics.impactAsync(
-                                        Haptics.ImpactFeedbackStyle.Light,
-                                    )
-                                }
-                                onPress={handleCancel}
-                                style={{
-                                    flex: 1,
-                                    paddingVertical: EdgeInsetsCON.LG,
-                                    alignItems: "center",
-                                    backgroundColor:
-                                        ColorFactoryCON.DANGER_MUTED,
-                                    borderRightWidth: 1,
-                                    borderRightColor:
-                                        ColorFactoryCON.CARD_BORDER,
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        fontSize: 16,
-                                        fontWeight: "500",
-                                        color: ColorFactoryCON.DANGER,
-                                    }}
-                                >
-                                    Cancel
-                                </Text>
-                            </Pressable>
-                            <Pressable
-                                onPressIn={() =>
-                                    Haptics.impactAsync(
-                                        Haptics.ImpactFeedbackStyle.Medium,
-                                    )
-                                }
-                                onPress={handleConfirm}
-                                style={{
-                                    flex: 1,
-                                    paddingVertical: EdgeInsetsCON.LG,
-                                    alignItems: "center",
-                                    backgroundColor:
-                                        ColorFactoryCON.CARD_BG_LIGHT_PRESSED,
-                                }}
-                            >
-                                <Text
-                                    style={{
-                                        fontSize: 16,
-                                        fontWeight: "600",
-                                        color: ColorFactoryCON.WHITE,
-                                    }}
-                                >
-                                    Confirm
-                                </Text>
-                            </Pressable>
-                        </View>
+                    {/* Floating buttons */}
+                    <Animated.View
+                        style={{
+                            transform: [{ translateY: cardTranslateY }],
+                            flexDirection: "row",
+                            marginHorizontal: EdgeInsetsCON.SCREEN_H,
+                            alignSelf: "stretch",
+                            gap: EdgeInsetsCON.SM,
+                            marginTop: EdgeInsetsCON.SM,
+                        }}
+                    >
+                        <StandardButtonComponent
+                            label="Cancel"
+                            onPress={handleCancel}
+                            variant={StandardButtonComponentVariant.DARK}
+                            style={{ flex: 1 }}
+                            hapticStyle={Haptics.ImpactFeedbackStyle.Light}
+                        />
+                        <StandardButtonComponent
+                            label="Confirm"
+                            onPress={handleConfirm}
+                            variant={StandardButtonComponentVariant.WHITE}
+                            style={{ flex: 1 }}
+                            hapticStyle={Haptics.ImpactFeedbackStyle.Medium}
+                        />
                     </Animated.View>
                 </Animated.View>
             </Modal>
