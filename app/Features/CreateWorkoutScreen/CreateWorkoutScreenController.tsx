@@ -43,7 +43,7 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
 
     const handleCreateExercise = (): void => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        console.log("Create Exercise action triggered");
+        router.push("/create-exercise");
     };
 
     const toolbarActions = [
@@ -176,7 +176,7 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                             placeholderTextColor={ColorFactoryCON.CARD_BORDER}
                             autoCapitalize="characters"
                             style={{
-                                fontSize: 32,
+                                fontSize: 22,
                                 fontWeight: "900",
                                 color: ColorFactoryCON.WHITE,
                                 textTransform: "uppercase",
