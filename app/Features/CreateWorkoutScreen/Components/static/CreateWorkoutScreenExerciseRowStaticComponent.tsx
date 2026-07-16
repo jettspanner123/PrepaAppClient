@@ -84,11 +84,13 @@ export default function CreateWorkoutScreenExerciseRowStaticComponent({
                 <View style={{ flex: 1, gap: 2 }}>
                     <Text
                         style={{
-                            fontSize: 20,
+                            fontFamily: "Anton",
+                            fontSize: 24,
                             fontWeight: "900",
                             color: ColorFactoryCON.WHITE,
                             textTransform: "uppercase",
                             letterSpacing: 0.5,
+                            flexWrap: "wrap",
                         }}
                     >
                         {item.name}

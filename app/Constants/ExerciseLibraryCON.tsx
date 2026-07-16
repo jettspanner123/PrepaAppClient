@@ -10,19 +10,19 @@ export default class ExerciseLibraryCON {
         // ─── Chest ────────────────────────────────────────────────────
         {
             id: "barbell-bench-press",
-            name: "Barbell Bench Press",
+            name: "Bench Press",
             category: "Barbell",
             muscleGroup: "Chest",
         },
         {
             id: "incline-barbell-bench-press",
-            name: "Incline Barbell Bench Press",
+            name: "Incline Bench Press",
             category: "Barbell",
             muscleGroup: "Chest",
         },
         {
             id: "decline-barbell-bench-press",
-            name: "Decline Barbell Bench Press",
+            name: "Decline Bench Press",
             category: "Barbell",
             muscleGroup: "Chest",
         },

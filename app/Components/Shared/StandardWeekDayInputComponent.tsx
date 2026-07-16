@@ -18,33 +18,18 @@ import StandardButtonComponent, {
 } from "./StandardButtonComponent";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
-const CURRENT_YEAR = new Date().getFullYear();
-const DEFAULT_FROM_YEAR = CURRENT_YEAR - 5;
-const DEFAULT_TO_YEAR = CURRENT_YEAR + 10;
 const ITEM_HEIGHT = 40;
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
 
-const MONTHS = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
+const WEEK_DAYS = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
 ];
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-export interface FullDate {
-    day: number;
-    month: number; // 0-indexed
-    year: number;
-}
 
 // ─── Wheel item ───────────────────────────────────────────────────────────────
 function WheelItem({
@@ -177,62 +162,36 @@ function WheelColumn({
     );
 }
 
-interface StandardFullDateInputComponentProps {
+interface StandardWeekDayInputComponentProps {
     label: string;
-    value: FullDate | null;
-    onChange: (date: FullDate) => void;
+    value: string | null;
+    onChange: (day: string) => void;
     placeholder?: string;
     inputClassName?: string;
     labelClassName?: string;
-    fromYear?: number;
-    toYear?: number;
     hasError?: boolean;
     isValid?: boolean;
     borderRadius?: number;
 }
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-function getDaysInMonth(month: number, year: number): number {
-    return new Date(year, month + 1, 0).getDate();
-}
-
-function formatDate(date: FullDate): string {
-    const day = String(date.day).padStart(2, "0");
-    return `${day} ${MONTHS[date.month]} ${date.year}`;
-}
-
 // ─── Main component ───────────────────────────────────────────────────────────
-export default function StandardFullDateInputComponent({
+export default function StandardWeekDayInputComponent({
     label,
     value,
     onChange,
-    placeholder = "Select a date",
+    placeholder = "Select a day",
     inputClassName,
     labelClassName,
-    fromYear = DEFAULT_FROM_YEAR,
-    toYear = DEFAULT_TO_YEAR,
     hasError = false,
     isValid = false,
     borderRadius = EdgeInsetsCON.MD,
-}: StandardFullDateInputComponentProps): React.JSX.Element {
-    const today = new Date();
-    const defaultDate: FullDate = value ?? {
-        day: today.getDate(),
-        month: today.getMonth(),
-        year: today.getFullYear(),
-    };
-
-    const years = Array.from({ length: toYear - fromYear + 1 }, (_, i) =>
-        String(fromYear + i),
-    );
+}: StandardWeekDayInputComponentProps): React.JSX.Element {
+    const defaultIndex = value ? WEEK_DAYS.indexOf(value) : 0;
+    const initialIndex = defaultIndex !== -1 ? defaultIndex : 0;
 
     const [open, setOpen] = useState<boolean>(false);
-    const [tempDate, setTempDate] = useState<FullDate>(defaultDate);
-    const [hoveredDay, setHoveredDay] = useState<number>(defaultDate.day - 1);
-    const [hoveredMonth, setHoveredMonth] = useState<number>(defaultDate.month);
-    const [hoveredYear, setHoveredYear] = useState<number>(
-        years.indexOf(String(defaultDate.year)),
-    );
+    const [tempIndex, setTempIndex] = useState<number>(initialIndex);
+    const [hoveredIndex, setHoveredIndex] = useState<number>(initialIndex);
 
     const backdropOpacity = useRef(new Animated.Value(0)).current;
     const cardTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
@@ -269,11 +228,6 @@ export default function StandardFullDateInputComponent({
         ]).start();
     }, [hasError]);
 
-    const days = Array.from(
-        { length: getDaysInMonth(tempDate.month, tempDate.year) },
-        (_, i) => String(i + 1).padStart(2, "0"),
-    );
-
     useEffect(() => {
         if (open) {
             Animated.parallel([
@@ -308,11 +262,10 @@ export default function StandardFullDateInputComponent({
     };
 
     const handleOpen = (): void => {
-        const d = value ?? defaultDate;
-        setTempDate(d);
-        setHoveredDay(d.day - 1);
-        setHoveredMonth(d.month);
-        setHoveredYear(years.indexOf(String(d.year)));
+        const valIndex = value ? WEEK_DAYS.indexOf(value) : 0;
+        const curIndex = valIndex !== -1 ? valIndex : 0;
+        setTempIndex(curIndex);
+        setHoveredIndex(curIndex);
         backdropOpacity.setValue(0);
         cardTranslateY.setValue(SCREEN_HEIGHT);
         setOpen(true);
@@ -320,7 +273,7 @@ export default function StandardFullDateInputComponent({
 
     const handleConfirm = (): void => {
         animateOut(() => {
-            onChange(tempDate);
+            onChange(WEEK_DAYS[tempIndex]);
             setOpen(false);
         });
     };
@@ -391,7 +344,7 @@ export default function StandardFullDateInputComponent({
                                 : ColorFactoryCON.MUTE,
                         }}
                     >
-                        {value ? formatDate(value) : placeholder}
+                        {value ?? placeholder}
                     </Text>
                     <Text style={{ fontSize: 14, color: ColorFactoryCON.MUTE }}>
                         ›
@@ -482,7 +435,7 @@ export default function StandardFullDateInputComponent({
                             overflow: "hidden",
                         }}
                     >
-                        {/* Three wheels */}
+                        {/* Wheel */}
                         <View
                             style={{
                                 flexDirection: "row",
@@ -505,55 +458,12 @@ export default function StandardFullDateInputComponent({
                                 }}
                             />
                             <WheelColumn
-                                data={days}
-                                hoveredIndex={hoveredDay}
-                                onHoverChange={setHoveredDay}
+                                data={WEEK_DAYS}
+                                hoveredIndex={hoveredIndex}
+                                onHoverChange={setHoveredIndex}
                                 onSelectIndex={(i) => {
-                                    setHoveredDay(i);
-                                    setTempDate((prev) => ({
-                                        ...prev,
-                                        day: i + 1,
-                                    }));
-                                }}
-                            />
-                            <View
-                                style={{
-                                    width: 1,
-                                    backgroundColor:
-                                        ColorFactoryCON.CARD_BORDER,
-                                    marginVertical: EdgeInsetsCON.SM,
-                                }}
-                            />
-                            <WheelColumn
-                                data={MONTHS}
-                                hoveredIndex={hoveredMonth}
-                                onHoverChange={setHoveredMonth}
-                                onSelectIndex={(i) => {
-                                    setHoveredMonth(i);
-                                    setTempDate((prev) => ({
-                                        ...prev,
-                                        month: i,
-                                    }));
-                                }}
-                            />
-                            <View
-                                style={{
-                                    width: 1,
-                                    backgroundColor:
-                                        ColorFactoryCON.CARD_BORDER,
-                                    marginVertical: EdgeInsetsCON.SM,
-                                }}
-                            />
-                            <WheelColumn
-                                data={years}
-                                hoveredIndex={hoveredYear}
-                                onHoverChange={setHoveredYear}
-                                onSelectIndex={(i) => {
-                                    setHoveredYear(i);
-                                    setTempDate((prev) => ({
-                                        ...prev,
-                                        year: fromYear + i,
-                                    }));
+                                    setHoveredIndex(i);
+                                    setTempIndex(i);
                                 }}
                             />
                         </View>
@@ -576,6 +486,7 @@ export default function StandardFullDateInputComponent({
                             variant={StandardButtonComponentVariant.DARK}
                             style={{ flex: 1 }}
                             hapticStyle={Haptics.ImpactFeedbackStyle.Light}
+                            borderRadius={borderRadius}
                         />
                         <StandardButtonComponent
                             label="Confirm"
@@ -583,6 +494,7 @@ export default function StandardFullDateInputComponent({
                             variant={StandardButtonComponentVariant.WHITE}
                             style={{ flex: 1 }}
                             hapticStyle={Haptics.ImpactFeedbackStyle.Medium}
+                            borderRadius={borderRadius}
                         />
                     </Animated.View>
                 </Animated.View>

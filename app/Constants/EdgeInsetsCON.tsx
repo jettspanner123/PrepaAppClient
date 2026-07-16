@@ -32,4 +32,7 @@ export default class EdgeInsetsCON {
     public static readonly SHADOW_OPACITY: number = 0.6;
     public static readonly SHADOW_RADIUS: number = 8;
     public static readonly SHADOW_ELEVATION: number = 8;
+
+    // ─── Component sizing ─────────────────────────────────────────────
+    public static readonly TOGGLE_SIZE: number = 20;
 }

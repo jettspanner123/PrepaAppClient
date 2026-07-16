@@ -5,9 +5,11 @@ import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import ExerciseLibraryCON from "@/app/Constants/ExerciseLibraryCON";
 import CreateWorkoutScreenCON from "@/app/Features/CreateWorkoutScreen/Constants/CreateWorkoutScreenCON";
+import StandardWeekDayInputComponent from "@/app/Components/Shared/StandardWeekDayInputComponent";
 import * as Haptics from "expo-haptics";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+    Animated,
     KeyboardAvoidingView,
     Platform,
     Pressable,
@@ -22,10 +24,33 @@ import CreateWorkoutScreenHeaderStaticComponent from "./Components/static/Create
 
 export default function CreateWorkoutScreenController(): React.JSX.Element {
     const [workoutName, setWorkoutName] = useState<string>("");
+    const [selectedWeekDay, setSelectedWeekDay] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [searchFocused, setSearchFocused] = useState<boolean>(false);
     const [activeGroup, setActiveGroup] = useState<string>("Chest");
+
+    const scrollViewRef = useRef<ScrollView>(null);
+
+    const clearBtnAnim = useRef(new Animated.Value(0)).current;
+
+    useEffect(() => {
+        Animated.timing(clearBtnAnim, {
+            toValue: selectedWeekDay !== null ? 1 : 0,
+            duration: 200,
+            useNativeDriver: false,
+        }).start();
+    }, [selectedWeekDay, clearBtnAnim]);
+
+    const clearBtnHeight = clearBtnAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, 48],
+    });
+
+    const clearBtnMargin = clearBtnAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [0, EdgeInsetsCON.SM],
+    });
 
     const filteredExercises = useMemo(() => {
         const q = searchQuery.trim().toLowerCase();
@@ -68,6 +93,7 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
                 <ScrollView
+                    ref={scrollViewRef}
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{
@@ -112,6 +138,36 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                                 paddingVertical: EdgeInsetsCON.XS,
                             }}
                         />
+                    </View>
+
+                    {/* Weekday selector input */}
+                    <View style={{ marginBottom: EdgeInsetsCON.XXL }}>
+                        <StandardWeekDayInputComponent
+                            label="Assign Week Day"
+                            value={selectedWeekDay}
+                            onChange={setSelectedWeekDay}
+                            placeholder="Select Day"
+                            borderRadius={0}
+                        />
+                        <Animated.View
+                            style={{
+                                height: clearBtnHeight,
+                                opacity: clearBtnAnim,
+                                marginTop: clearBtnMargin,
+                                overflow: "hidden",
+                            }}
+                        >
+                            <StandardButtonComponent
+                                label="Clear"
+                                onPress={() => {
+                                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                    setSelectedWeekDay(null);
+                                }}
+                                variant={StandardButtonComponentVariant.DANGER}
+                                style={{ height: 48, justifyContent: "center" }}
+                                borderRadius={0}
+                            />
+                        </Animated.View>
                     </View>
 
                     {/* Exercise selection section */}
@@ -187,7 +243,15 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                                 placeholderTextColor={
                                     ColorFactoryCON.CARD_BORDER
                                 }
-                                onFocus={() => setSearchFocused(true)}
+                                onFocus={() => {
+                                    setSearchFocused(true);
+                                    setTimeout(() => {
+                                        scrollViewRef.current?.scrollTo({
+                                            y: CreateWorkoutScreenCON.SEARCH_FOCUS_SCROLL_Y,
+                                            animated: true,
+                                        });
+                                    }, 100);
+                                }}
                                 onBlur={() => setSearchFocused(false)}
                                 style={{
                                     flex: 1,

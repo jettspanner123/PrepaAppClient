@@ -35,8 +35,6 @@ export default function CreateWorkoutScreenHeaderStaticComponent(): React.JSX.El
                     height: 40,
                     alignItems: "center",
                     justifyContent: "center",
-                    borderWidth: 1,
-                    borderColor: ColorFactoryCON.CARD_BORDER,
                 }}
             >
                 <Text
@@ -53,11 +51,11 @@ export default function CreateWorkoutScreenHeaderStaticComponent(): React.JSX.El
             {/* Title */}
             <Text
                 style={{
-                    fontSize: 22,
+                    fontFamily: "Anton",
+                    fontSize: 24,
                     fontWeight: "900",
                     color: ColorFactoryCON.WHITE,
                     textTransform: "uppercase",
-                    letterSpacing: 2,
                 }}
             >
                 {CreateWorkoutScreenCON.PAGE_TITLE}
