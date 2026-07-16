@@ -2,20 +2,105 @@ import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
-import React from "react";
-import { Pressable, Text, View } from "react-native";
+import * as Haptics from "expo-haptics";
+import React, { useState } from "react";
+import {
+    LayoutAnimation,
+    Platform,
+    Pressable,
+    Text,
+    UIManager,
+    View,
+} from "react-native";
+
+if (
+    Platform.OS === "android" &&
+    UIManager.setLayoutAnimationEnabledExperimental
+) {
+    UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+export interface ToolbarAction {
+    label: string;
+    onPress: () => void;
+    icon?: string;
+}
 
 interface ApplicationStickyToolbarProps {
     title: string;
     onClose: () => void;
     leftIconType?: "close" | "back";
+    rightIconType?: "more" | "none";
+    onRightPress?: () => void;
+    actions?: ToolbarAction[];
+}
+
+function ActionButton({ action }: { action: ToolbarAction }): React.JSX.Element {
+    const [pressed, setPressed] = useState<boolean>(false);
+
+    return (
+        <Pressable
+            onPressIn={() => {
+                setPressed(true);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            onPressOut={() => setPressed(false)}
+            onPress={action.onPress}
+            style={{
+                flex: 1,
+                flexDirection: "row",
+                gap: EdgeInsetsCON.XS,
+                borderWidth: 1,
+                borderColor: ColorFactoryCON.CARD_BORDER,
+                backgroundColor: pressed
+                    ? ColorFactoryCON.CARD_BG_LIGHT_PRESSED
+                    : ColorFactoryCON.CARD_BG_LIGHT,
+                paddingVertical: EdgeInsetsCON.MD,
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+        >
+            {action.icon && (
+                <Ionicons
+                    name={action.icon as any}
+                    size={14}
+                    color={ColorFactoryCON.WHITE}
+                />
+            )}
+            <Text
+                style={{
+                    fontSize: 10,
+                    fontWeight: "700",
+                    color: ColorFactoryCON.WHITE,
+                    textTransform: "uppercase",
+                    letterSpacing: 1.5,
+                }}
+            >
+                {action.label}
+            </Text>
+        </Pressable>
+    );
 }
 
 export default function ApplicationStickyToolbar({
     title,
     onClose,
     leftIconType = "close",
+    rightIconType = "none",
+    onRightPress,
+    actions = [],
 }: ApplicationStickyToolbarProps): React.JSX.Element {
+    const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
+    const handleMorePress = (): void => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setIsExpanded((prev) => !prev);
+        if (onRightPress) {
+            onRightPress();
+        }
+    };
+
     return (
         <BlurView
             intensity={50}
@@ -80,9 +165,43 @@ export default function ApplicationStickyToolbar({
                     {title}
                 </Text>
 
-                {/* Spacer to centre the title */}
-                <View style={{ width: 40 }} />
+                {/* Right button or Spacer to centre the title */}
+                {rightIconType === "more" ? (
+                    <Pressable
+                        onPress={handleMorePress}
+                        hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                        style={{
+                            width: 40,
+                            height: 40,
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <Ionicons
+                            name={isExpanded ? "close" : "ellipsis-vertical"}
+                            size={24}
+                            color={ColorFactoryCON.WHITE}
+                        />
+                    </Pressable>
+                ) : (
+                    <View style={{ width: 40 }} />
+                )}
             </View>
+
+            {/* Expanded Actions */}
+            {isExpanded && actions && actions.length > 0 && (
+                <View
+                    style={{
+                        flexDirection: "row",
+                        gap: EdgeInsetsCON.SM,
+                        marginTop: EdgeInsetsCON.LG,
+                    }}
+                >
+                    {actions.map((action, index) => (
+                        <ActionButton key={index} action={action} />
+                    ))}
+                </View>
+            )}
         </BlurView>
     );
 }

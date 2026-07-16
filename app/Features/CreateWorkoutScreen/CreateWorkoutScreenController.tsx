@@ -31,6 +31,34 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
         router.back();
     };
 
+    const handleRightPress = (): void => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        console.log("Right action pressed");
+    };
+
+    const handleVoiceModule = (): void => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        console.log("Voice Module action triggered");
+    };
+
+    const handleCreateExercise = (): void => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        console.log("Create Exercise action triggered");
+    };
+
+    const toolbarActions = [
+        {
+            label: "Voice Module",
+            onPress: handleVoiceModule,
+            icon: "mic-outline",
+        },
+        {
+            label: "Create Exercise",
+            onPress: handleCreateExercise,
+            icon: "add-circle-outline",
+        },
+    ];
+
     const [workoutName, setWorkoutName] = useState<string>("");
     const [selectedWeekDay, setSelectedWeekDay] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -105,6 +133,9 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                     title={CreateWorkoutScreenCON.PAGE_TITLE}
                     onClose={handleClose}
                     leftIconType="back"
+                    rightIconType="more"
+                    onRightPress={handleRightPress}
+                    actions={toolbarActions}
                 />
 
                 <ScrollView

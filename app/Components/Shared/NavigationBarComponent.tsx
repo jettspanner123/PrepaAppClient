@@ -9,7 +9,7 @@ import {
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
-import { Pressable, Text } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface NavigationBarItem {
@@ -80,10 +80,11 @@ export default function NavigationBarComponent({
     currentKey,
     onPress,
 }: NavigationBarComponentProps): React.JSX.Element {
+    const ranksItem = items.find((item) => item.label.toLowerCase() === "ranks");
+    const mainItems = items.filter((item) => item.label.toLowerCase() !== "ranks");
+
     return (
-        <BlurView
-            intensity={60}
-            tint="dark"
+        <View
             style={{
                 position: "absolute",
                 bottom: EdgeInsetsCON.LG,
@@ -91,30 +92,73 @@ export default function NavigationBarComponent({
                 right: EdgeInsetsCON.SCREEN_H,
                 flexDirection: "row",
                 alignItems: "stretch",
-                borderWidth: 1,
-                borderColor: ColorFactoryCON.CARD_BORDER,
-                overflow: "hidden",
-                shadowColor: ColorFactoryCON.SHADOW,
-                shadowOffset: { width: 0, height: 8 },
-                shadowOpacity: 0.6,
-                shadowRadius: 16,
-                elevation: 12,
+                gap: EdgeInsetsCON.MD,
             }}
+            pointerEvents="box-none"
         >
-            {items.map((item) => (
-                <TabItem
-                    key={item.key}
-                    item={item}
-                    isActive={currentKey === item.key}
-                    onPress={() => onPress(item.key)}
-                />
-            ))}
-        </BlurView>
+            {ranksItem && (
+                <BlurView
+                    intensity={60}
+                    tint="dark"
+                    style={{
+                        width: 72,
+                        borderWidth: 1,
+                        borderColor: ColorFactoryCON.CARD_BORDER,
+                        overflow: "hidden",
+                        shadowColor: ColorFactoryCON.SHADOW,
+                        shadowOffset: { width: 0, height: 8 },
+                        shadowOpacity: 0.6,
+                        shadowRadius: 16,
+                        elevation: 12,
+                    }}
+                >
+                    <TabItem
+                        item={ranksItem}
+                        isActive={currentKey === ranksItem.key}
+                        onPress={() => onPress(ranksItem.key)}
+                    />
+                </BlurView>
+            )}
+
+            <BlurView
+                intensity={60}
+                tint="dark"
+                style={{
+                    flex: 1,
+                    flexDirection: "row",
+                    alignItems: "stretch",
+                    borderWidth: 1,
+                    borderColor: ColorFactoryCON.CARD_BORDER,
+                    overflow: "hidden",
+                    shadowColor: ColorFactoryCON.SHADOW,
+                    shadowOffset: { width: 0, height: 8 },
+                    shadowOpacity: 0.6,
+                    shadowRadius: 16,
+                    elevation: 12,
+                }}
+            >
+                {mainItems.map((item) => (
+                    <TabItem
+                        key={item.key}
+                        item={item}
+                        isActive={currentKey === item.key}
+                        onPress={() => onPress(item.key)}
+                    />
+                ))}
+            </BlurView>
+        </View>
     );
 }
 
 // ─── Preset icon helpers ──────────────────────────────────────────────────────
 export const NavIcons = {
+    ranks: (active: boolean) => (
+        <Ionicons
+            name="trophy-outline"
+            size={20}
+            color={active ? ColorFactoryCON.INK : ColorFactoryCON.MUTE}
+        />
+    ),
     barbell: (active: boolean) => (
         <Ionicons
             name="barbell-outline"
