@@ -1,7 +1,8 @@
 import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
+import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import {
     Animated,
     Dimensions,
@@ -10,6 +11,9 @@ import {
     Text,
     View,
 } from "react-native";
+import StandardButtonComponent, {
+    StandardButtonComponentVariant,
+} from "./StandardButtonComponent";
 
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
 
@@ -23,71 +27,11 @@ interface StandardConfirmationModalComponentProps {
     onCancel: () => void;
 }
 
-function ActionButton({
-    label,
-    onPress,
-    isPrimary,
-    hasBorderRight,
-}: {
-    label: string;
-    onPress: () => void;
-    isPrimary: boolean;
-    hasBorderRight: boolean;
-}): React.JSX.Element {
-    const [pressed, setPressed] = useState<boolean>(false);
-
-    const bg = isPrimary
-        ? pressed
-            ? ColorFactoryCON.HAIRLINE
-            : ColorFactoryCON.WHITE
-        : pressed
-          ? ColorFactoryCON.CARD_BG_LIGHT_PRESSED
-          : "transparent";
-
-    const textColor = isPrimary ? ColorFactoryCON.BLACK : ColorFactoryCON.MUTE;
-
-    return (
-        <Pressable
-            onPressIn={() => {
-                setPressed(true);
-                Haptics.impactAsync(
-                    isPrimary
-                        ? Haptics.ImpactFeedbackStyle.Medium
-                        : Haptics.ImpactFeedbackStyle.Light,
-                );
-            }}
-            onPressOut={() => setPressed(false)}
-            onPress={onPress}
-            style={{
-                flex: 1,
-                paddingVertical: EdgeInsetsCON.LG,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: bg,
-                borderRightWidth: hasBorderRight ? 1 : 0,
-                borderRightColor: ColorFactoryCON.CARD_BORDER,
-            }}
-        >
-            <Text
-                style={{
-                    fontSize: 13,
-                    fontWeight: "700",
-                    color: textColor,
-                    textTransform: "uppercase",
-                    letterSpacing: 2,
-                }}
-            >
-                {label}
-            </Text>
-        </Pressable>
-    );
-}
-
 export default function StandardConfirmationModalComponent({
     visible,
     title,
     subtitle,
-    confirmLabel = "Done",
+    confirmLabel = "Confirm",
     cancelLabel = "Cancel",
     onConfirm,
     onCancel,
@@ -102,7 +46,7 @@ export default function StandardConfirmationModalComponent({
             Animated.parallel([
                 Animated.timing(backdropOpacity, {
                     toValue: 1,
-                    duration: 200,
+                    duration: 250,
                     useNativeDriver: false,
                 }),
                 Animated.spring(cardTranslateY, {
@@ -113,18 +57,18 @@ export default function StandardConfirmationModalComponent({
                 }),
             ]).start();
         }
-    }, [visible]);
+    }, [visible, backdropOpacity, cardTranslateY]);
 
     const animateOut = (callback: () => void): void => {
         Animated.parallel([
             Animated.timing(backdropOpacity, {
                 toValue: 0,
-                duration: 180,
+                duration: 200,
                 useNativeDriver: false,
             }),
             Animated.timing(cardTranslateY, {
                 toValue: SCREEN_HEIGHT,
-                duration: 180,
+                duration: 200,
                 useNativeDriver: true,
             }),
         ]).start(() => callback());
@@ -135,7 +79,7 @@ export default function StandardConfirmationModalComponent({
 
     const backdropBg = backdropOpacity.interpolate({
         inputRange: [0, 1],
-        outputRange: ["rgba(0,0,0,0)", "rgba(0,0,0,0.85)"],
+        outputRange: ["rgba(0,0,0,0)", "rgba(0,0,0,0.7)"],
     });
 
     return (
@@ -153,6 +97,21 @@ export default function StandardConfirmationModalComponent({
                     alignItems: "center",
                 }}
             >
+                <Animated.View
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        opacity: backdropOpacity,
+                    }}
+                >
+                    <BlurView
+                        intensity={30}
+                        tint="dark"
+                        style={{
+                            flex: 1,
+                        }}
+                    />
+                </Animated.View>
                 <Pressable
                     style={{ position: "absolute", inset: 0 } as any}
                     onPress={handleCancel}
@@ -162,7 +121,8 @@ export default function StandardConfirmationModalComponent({
                 <Animated.View
                     style={{
                         transform: [{ translateY: cardTranslateY }],
-                        backgroundColor: ColorFactoryCON.BLACK,
+                        backgroundColor: ColorFactoryCON.CARD_BG_LIGHT,
+                        borderRadius: 0,
                         borderWidth: 1,
                         borderColor: ColorFactoryCON.CARD_BORDER,
                         marginHorizontal: EdgeInsetsCON.SCREEN_H,
@@ -174,8 +134,6 @@ export default function StandardConfirmationModalComponent({
                     <View
                         style={{
                             padding: EdgeInsetsCON.XL,
-                            borderBottomWidth: 1,
-                            borderBottomColor: ColorFactoryCON.CARD_BORDER,
                             gap: EdgeInsetsCON.SM,
                         }}
                     >
@@ -203,22 +161,35 @@ export default function StandardConfirmationModalComponent({
                             </Text>
                         )}
                     </View>
+                </Animated.View>
 
-                    {/* Buttons */}
-                    <View style={{ flexDirection: "row" }}>
-                        <ActionButton
-                            label={cancelLabel}
-                            onPress={handleCancel}
-                            isPrimary={false}
-                            hasBorderRight={true}
-                        />
-                        <ActionButton
-                            label={confirmLabel}
-                            onPress={handleConfirm}
-                            isPrimary={true}
-                            hasBorderRight={false}
-                        />
-                    </View>
+                {/* Floating buttons */}
+                <Animated.View
+                    style={{
+                        transform: [{ translateY: cardTranslateY }],
+                        flexDirection: "row",
+                        marginHorizontal: EdgeInsetsCON.SCREEN_H,
+                        alignSelf: "stretch",
+                        gap: EdgeInsetsCON.SM,
+                        marginTop: EdgeInsetsCON.SM,
+                    }}
+                >
+                    <StandardButtonComponent
+                        label={cancelLabel}
+                        onPress={handleCancel}
+                        variant={StandardButtonComponentVariant.DARK}
+                        style={{ flex: 1 }}
+                        hapticStyle={Haptics.ImpactFeedbackStyle.Light}
+                        borderRadius={0}
+                    />
+                    <StandardButtonComponent
+                        label={confirmLabel}
+                        onPress={handleConfirm}
+                        variant={StandardButtonComponentVariant.WHITE}
+                        style={{ flex: 1 }}
+                        hapticStyle={Haptics.ImpactFeedbackStyle.Medium}
+                        borderRadius={0}
+                    />
                 </Animated.View>
             </Animated.View>
         </Modal>

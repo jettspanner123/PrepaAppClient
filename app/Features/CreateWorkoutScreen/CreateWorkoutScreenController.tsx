@@ -1,12 +1,14 @@
+import ApplicationStickyToolbar from "@/app/Components/Shared/ApplicationStickyToolbar";
 import StandardButtonComponent, {
     StandardButtonComponentVariant,
 } from "@/app/Components/Shared/StandardButtonComponent";
+import StandardWeekDayInputComponent from "@/app/Components/Shared/StandardWeekDayInputComponent";
 import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import ExerciseLibraryCON from "@/app/Constants/ExerciseLibraryCON";
 import CreateWorkoutScreenCON from "@/app/Features/CreateWorkoutScreen/Constants/CreateWorkoutScreenCON";
-import StandardWeekDayInputComponent from "@/app/Components/Shared/StandardWeekDayInputComponent";
 import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
     Animated,
@@ -20,9 +22,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import CreateWorkoutScreenExerciseRowStaticComponent from "./Components/static/CreateWorkoutScreenExerciseRowStaticComponent";
-import CreateWorkoutScreenHeaderStaticComponent from "./Components/static/CreateWorkoutScreenHeaderStaticComponent";
 
 export default function CreateWorkoutScreenController(): React.JSX.Element {
+    const router = useRouter();
+
+    const handleClose = (): void => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        router.back();
+    };
+
     const [workoutName, setWorkoutName] = useState<string>("");
     const [selectedWeekDay, setSelectedWeekDay] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>("");
@@ -92,21 +100,30 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                 style={{ flex: 1 }}
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
             >
+                {/* Header — title + close */}
+                <ApplicationStickyToolbar
+                    title={CreateWorkoutScreenCON.PAGE_TITLE}
+                    onClose={handleClose}
+                    leftIconType="back"
+                />
+
                 <ScrollView
                     ref={scrollViewRef}
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                     contentContainerStyle={{
                         paddingHorizontal: EdgeInsetsCON.SCREEN_H,
-                        paddingTop: EdgeInsetsCON.SCREEN_TOP,
+                        paddingTop: CreateWorkoutScreenCON.SCROLL_PADDING_TOP,
                         paddingBottom: EdgeInsetsCON.SCROLL_BOTTOM_CLEARANCE,
                     }}
                 >
-                    {/* Header — title + close */}
-                    <CreateWorkoutScreenHeaderStaticComponent />
-
                     {/* Workout name input */}
-                    <View style={{ marginBottom: EdgeInsetsCON.XXL }}>
+                    <View
+                        style={{
+                            marginTop: EdgeInsetsCON.LG,
+                            marginBottom: EdgeInsetsCON.XXL,
+                        }}
+                    >
                         <Text
                             style={{
                                 fontSize: 10,
@@ -160,7 +177,9 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                             <StandardButtonComponent
                                 label="Clear"
                                 onPress={() => {
-                                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                                    Haptics.impactAsync(
+                                        Haptics.ImpactFeedbackStyle.Light,
+                                    );
                                     setSelectedWeekDay(null);
                                 }}
                                 variant={StandardButtonComponentVariant.DANGER}
@@ -287,7 +306,8 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                                             key={group}
                                             onPress={() => {
                                                 Haptics.impactAsync(
-                                                    Haptics.ImpactFeedbackStyle.Light,
+                                                    Haptics.ImpactFeedbackStyle
+                                                        .Light,
                                                 );
                                                 setActiveGroup(group);
                                             }}

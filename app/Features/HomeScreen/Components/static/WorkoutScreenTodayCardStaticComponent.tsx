@@ -20,7 +20,12 @@ export default function WorkoutScreenTodayCardStaticComponent(): React.JSX.Eleme
     };
 
     return (
-        <View style={{ marginBottom: EdgeInsetsCON.XXL }}>
+        <View
+            style={{
+                marginTop: EdgeInsetsCON.LG,
+                marginBottom: EdgeInsetsCON.XXL,
+            }}
+        >
             {/* Section header */}
             <View
                 style={{

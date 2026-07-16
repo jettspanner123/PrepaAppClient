@@ -8,6 +8,8 @@ export default class HomeScreenCON {
     public static readonly WORKOUT_VIEW_ALL: string = "View All";
     public static readonly WORKOUT_CRAVE_LABEL: string = "Crave Something Else";
     public static readonly WORKOUT_CREATE_CTA: string = "Create Workout";
+    public static readonly WORKOUT_AI_INSIGHT: string =
+        "Deadlifts got 100kg last time for 10 reps. Today's goal is 100kg for 11 reps.";
 
     public static readonly WORKOUT_TODAY_TAGS: string[] = [
         "STRENGTH",
