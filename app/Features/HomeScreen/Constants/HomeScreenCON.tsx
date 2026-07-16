@@ -6,6 +6,8 @@ export default class HomeScreenCON {
     public static readonly WORKOUT_HERO_HEADLINE: string = "Forge Ahead.";
     public static readonly WORKOUT_SECTION_LABEL: string = "TODAY'S FORGE";
     public static readonly WORKOUT_VIEW_ALL: string = "View All";
+    public static readonly WORKOUT_CRAVE_LABEL: string = "Crave Something Else";
+    public static readonly WORKOUT_CREATE_CTA: string = "Create Workout";
 
     public static readonly WORKOUT_TODAY_TAGS: string[] = [
         "STRENGTH",

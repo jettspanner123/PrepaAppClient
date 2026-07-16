@@ -6,6 +6,8 @@ import { Text, View } from "react-native";
 
 interface WorkoutEngineScreenHeaderStaticComponentProps {
     isRunning: boolean;
+    titleLine1?: string;
+    titleLine2?: string;
 }
 
 function formatTime(seconds: number): string {
@@ -18,6 +20,8 @@ function formatTime(seconds: number): string {
 
 export default function WorkoutEngineScreenHeaderStaticComponent({
     isRunning,
+    titleLine1 = WorkoutEngineScreenCON.SESSION_TITLE_LINE1,
+    titleLine2 = WorkoutEngineScreenCON.SESSION_TITLE_LINE2,
 }: WorkoutEngineScreenHeaderStaticComponentProps): React.JSX.Element {
     const [elapsed, setElapsed] = useState<number>(0);
 
@@ -71,7 +75,7 @@ export default function WorkoutEngineScreenHeaderStaticComponent({
                     lineHeight: 52,
                 }}
             >
-                {WorkoutEngineScreenCON.SESSION_TITLE_LINE1}
+                {titleLine1}
             </Text>
             <Text
                 style={{
@@ -83,7 +87,7 @@ export default function WorkoutEngineScreenHeaderStaticComponent({
                     marginBottom: EdgeInsetsCON.LG,
                 }}
             >
-                {WorkoutEngineScreenCON.SESSION_TITLE_LINE2}
+                {titleLine2}
             </Text>
 
             {/* Timer — on its own line below the title */}

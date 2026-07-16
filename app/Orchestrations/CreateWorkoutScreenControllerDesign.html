@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en" class="dark" style="">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Hanken+Grotesk:wght@400;600&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <script id="tailwind-config">
+            try {
+                tailwind.config = {
+                    darkMode: "class",
+                    theme: {
+                        extend: {
+                            colors: {
+                                "surface-container-high": "#2a2a2a",
+                                "on-background": "#e5e2e1",
+                                "tertiary-fixed": "#e2e2e2",
+                                "surface-bright": "#393939",
+                                secondary: "#c6c6c6",
+                                "on-tertiary-fixed-variant": "#454747",
+                                "on-primary-fixed-variant": "#454747",
+                                "surface-tint": "#c6c6c7",
+                                "surface-container": "#20201f",
+                                "secondary-fixed-dim": "#c6c6c6",
+                                "primary-fixed": "#e2e2e2",
+                                "on-primary-fixed": "#1a1c1c",
+                                "surface-variant": "#353535",
+                                "on-surface": "#e5e2e1",
+                                "on-tertiary-container": "#636565",
+                                "on-secondary": "#303030",
+                                primary: "#ffffff",
+                                "outline-variant": "#444748",
+                                "surface-dim": "#131313",
+                                "on-primary": "#2f3131",
+                                "surface-container-low": "#1c1b1b",
+                                surface: "#131313",
+                                "on-secondary-container": "#b5b5b5",
+                                "primary-container": "#e2e2e2",
+                                "tertiary-container": "#e2e2e2",
+                                "surface-container-highest": "#353535",
+                                "secondary-container": "#474747",
+                                "error-container": "#93000a",
+                                "primary-fixed-dim": "#c6c6c7",
+                                background: "#131313",
+                                "on-tertiary-fixed": "#1a1c1c",
+                                "on-secondary-fixed": "#1b1b1b",
+                                "on-error": "#690005",
+                                tertiary: "#ffffff",
+                                "tertiary-fixed-dim": "#c6c6c7",
+                                outline: "#8e9192",
+                                error: "#ffb4ab",
+                                "on-error-container": "#ffdad6",
+                                "surface-container-lowest": "#0e0e0e",
+                                "secondary-fixed": "#e2e2e2",
+                                "inverse-on-surface": "#313030",
+                                "inverse-primary": "#5d5f5f",
+                                "on-secondary-fixed-variant": "#474747",
+                                "on-surface-variant": "#c4c7c8",
+                                "on-tertiary": "#2f3131",
+                                "inverse-surface": "#e5e2e1",
+                                "on-primary-container": "#636565",
+                            },
+                            borderRadius: {
+                                DEFAULT: "0.25rem",
+                                lg: "0.5rem",
+                                xl: "0.75rem",
+                                full: "9999px",
+                            },
+                            spacing: {
+                                "stack-xl": "80px",
+                                "margin-mobile": "20px",
+                                gutter: "24px",
+                                unit: "4px",
+                                "stack-lg": "48px",
+                                "container-max": "1440px",
+                                "stack-md": "24px",
+                                "margin-desktop": "64px",
+                                "stack-sm": "8px",
+                            },
+                            fontFamily: {
+                                "label-caps": ["JetBrains Mono"],
+                                "display-lg-mobile": ["Anton"],
+                                "display-lg": ["Anton"],
+                                "body-md": ["Hanken Grotesk"],
+                                "headline-lg": ["Anton"],
+                                "body-lg": ["Hanken Grotesk"],
+                                "headline-md": ["Anton"],
+                            },
+                            fontSize: {
+                                "label-caps": [
+                                    "12px",
+                                    {
+                                        lineHeight: "16px",
+                                        letterSpacing: "0.1em",
+                                        fontWeight: "700",
+                                    },
+                                ],
+                                "display-lg-mobile": [
+                                    "48px",
+                                    {
+                                        lineHeight: "44px",
+                                        letterSpacing: "-0.02em",
+                                        fontWeight: "400",
+                                    },
+                                ],
+                                "display-lg": [
+                                    "96px",
+                                    {
+                                        lineHeight: "90px",
+                                        letterSpacing: "-0.04em",
+                                        fontWeight: "400",
+                                    },
+                                ],
+                                "body-md": [
+                                    "16px",
+                                    {
+                                        lineHeight: "24px",
+                                        letterSpacing: "0em",
+                                        fontWeight: "400",
+                                    },
+                                ],
+                                "headline-lg": [
+                                    "40px",
+                                    {
+                                        lineHeight: "48px",
+                                        letterSpacing: "0.02em",
+                                        fontWeight: "400",
+                                    },
+                                ],
+                                "body-lg": [
+                                    "18px",
+                                    {
+                                        lineHeight: "28px",
+                                        letterSpacing: "0em",
+                                        fontWeight: "400",
+                                    },
+                                ],
+                                "headline-md": [
+                                    "32px",
+                                    {
+                                        lineHeight: "36px",
+                                        letterSpacing: "0.02em",
+                                        fontWeight: "400",
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                };
+            } catch (_e) {}
+        </script>
+    </head>
+    <body
+        class="bg-background text-on-background antialiased min-h-screen flex flex-col items-center"
+    >
+        <!-- TopAppBar -->
+        <header
+            class="bg-background dark:bg-background border-b border-outline-variant dark:border-outline-variant flat no shadows transition-all duration-150 ease-out flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop h-20 docked full-width top-0 z-40 fixed"
+        >
+            <button
+                class="text-primary dark:text-primary hover:bg-on-background dark:hover:bg-on-background hover:text-background dark:hover:text-background p-2 rounded-full transition-colors flex items-center justify-center w-12 h-12"
+                aria-label="Close"
+            >
+                <span
+                    class="material-symbols-outlined"
+                    style="font-variation-settings: &quot;FILL&quot; 0"
+                    >close</span
+                >
+            </button>
+            <h1
+                class="font-headline-md text-headline-md uppercase text-primary dark:text-primary text-center"
+            >
+                NEW WORKOUT
+            </h1>
+        </header>
+
+        <!-- Main Content Canvas -->
+        <main
+            class="w-full max-w-container-max px-margin-mobile md:px-margin-desktop pt-32 pb-32 flex flex-col gap-stack-lg flex-grow"
+        >
+            <!-- Workout Name Input Section -->
+            <section
+                class="flex flex-col gap-stack-sm w-full max-w-2xl mx-auto"
+            >
+                <label
+                    for="workout-name"
+                    class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest"
+                    >Workout Name</label
+                >
+                <input
+                    type="text"
+                    id="workout-name"
+                    placeholder="e.g. Leg Day Power"
+                    class="w-full bg-transparent border-0 border-b-2 border-primary focus:ring-0 focus:border-primary text-primary font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg placeholder-surface-variant py-unit outline-none transition-all duration-150 ease-out font-[Anton] uppercase"
+                />
+            </section>
+
+            <!-- Exercises Selection Section -->
+            <section
+                class="w-full max-w-2xl mx-auto flex flex-col gap-stack-md"
+            >
+                <div
+                    class="flex justify-between items-end border-b border-outline-variant pb-unit"
+                >
+                    <h2
+                        class="font-label-caps text-label-caps text-primary uppercase tracking-widest"
+                    >
+                        Select Exercises
+                    </h2>
+                    <span
+                        class="font-label-caps text-label-caps text-on-surface-variant"
+                        >0/6 SELECTED</span
+                    >
+                </div>
+                <div
+                    class="relative mt-stack-md group border border-outline-variant rounded p-2 flex items-center gap-2 focus-within:border-primary transition-all duration-150"
+                >
+                    <span
+                        class="material-symbols-outlined text-on-surface-variant group-focus-within:text-primary transition-colors"
+                        >search</span
+                    >
+                    <input
+                        type="text"
+                        placeholder="SEARCH EXERCISES..."
+                        class="w-full bg-transparent border-0 focus:ring-0 text-primary font-label-caps text-label-caps py-1 outline-none uppercase placeholder-surface-variant"
+                    />
+                </div>
+
+                <div class="flex flex-col">
+                    <!-- Exercise Item 1 -->
+                    <label
+                        class="group flex items-center justify-between py-stack-md border-b border-outline-variant cursor-pointer hover:bg-surface transition-colors duration-150 px-4 -mx-4 rounded-sm"
+                    >
+                        <div class="flex items-center gap-4">
+                            <div class="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    class="custom-checkbox opacity-0 absolute h-0 w-0"
+                                />
+                                <div
+                                    class="w-6 h-6 border-2 border-outline-variant rounded flex items-center justify-center transition-colors group-hover:border-primary"
+                                >
+                                    <svg
+                                        class="hidden w-4 h-4 text-background"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="3"
+                                            d="M5 13l4 4L19 7"
+                                        ></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="font-headline-md text-headline-md text-primary group-hover:text-primary transition-colors"
+                                    >SQUAT</span
+                                >
+                                <span
+                                    class="font-label-caps text-label-caps text-on-surface-variant"
+                                    >LOWER BODY / COMPOUND</span
+                                >
+                            </div>
+                        </div>
+                        <span
+                            class="font-label-caps text-label-caps text-outline-variant"
+                            >01</span
+                        >
+                    </label>
+
+                    <!-- Exercise Item 2 -->
+                    <label
+                        class="group flex items-center justify-between py-stack-md border-b border-outline-variant cursor-pointer hover:bg-surface transition-colors duration-150 px-4 -mx-4 rounded-sm"
+                    >
+                        <div class="flex items-center gap-4">
+                            <div class="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    class="custom-checkbox opacity-0 absolute h-0 w-0"
+                                />
+                                <div
+                                    class="w-6 h-6 border-2 border-outline-variant rounded flex items-center justify-center transition-colors group-hover:border-primary"
+                                >
+                                    <svg
+                                        class="hidden w-4 h-4 text-background"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="3"
+                                            d="M5 13l4 4L19 7"
+                                        ></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="font-headline-md text-headline-md text-primary group-hover:text-primary transition-colors"
+                                    >BENCH PRESS</span
+                                >
+                                <span
+                                    class="font-label-caps text-label-caps text-on-surface-variant"
+                                    >UPPER BODY / CHEST</span
+                                >
+                            </div>
+                        </div>
+                        <span
+                            class="font-label-caps text-label-caps text-outline-variant"
+                            >02</span
+                        >
+                    </label>
+
+                    <!-- Exercise Item 3 -->
+                    <label
+                        class="group flex items-center justify-between py-stack-md border-b border-outline-variant cursor-pointer hover:bg-surface transition-colors duration-150 px-4 -mx-4 rounded-sm"
+                    >
+                        <div class="flex items-center gap-4">
+                            <div class="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    class="custom-checkbox opacity-0 absolute h-0 w-0"
+                                />
+                                <div
+                                    class="w-6 h-6 border-2 border-outline-variant rounded flex items-center justify-center transition-colors group-hover:border-primary"
+                                >
+                                    <svg
+                                        class="hidden w-4 h-4 text-background"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="3"
+                                            d="M5 13l4 4L19 7"
+                                        ></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="font-headline-md text-headline-md text-primary group-hover:text-primary transition-colors"
+                                    >DEADLIFT</span
+                                >
+                                <span
+                                    class="font-label-caps text-label-caps text-on-surface-variant"
+                                    >FULL BODY / BACK</span
+                                >
+                            </div>
+                        </div>
+                        <span
+                            class="font-label-caps text-label-caps text-outline-variant"
+                            >03</span
+                        >
+                    </label>
+
+                    <!-- Exercise Item 4 -->
+                    <label
+                        class="group flex items-center justify-between py-stack-md border-b border-outline-variant cursor-pointer hover:bg-surface transition-colors duration-150 px-4 -mx-4 rounded-sm"
+                    >
+                        <div class="flex items-center gap-4">
+                            <div class="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    class="custom-checkbox opacity-0 absolute h-0 w-0"
+                                />
+                                <div
+                                    class="w-6 h-6 border-2 border-outline-variant rounded flex items-center justify-center transition-colors group-hover:border-primary"
+                                >
+                                    <svg
+                                        class="hidden w-4 h-4 text-background"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="3"
+                                            d="M5 13l4 4L19 7"
+                                        ></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="font-headline-md text-headline-md text-primary group-hover:text-primary transition-colors"
+                                    >PULL-UP</span
+                                >
+                                <span
+                                    class="font-label-caps text-label-caps text-on-surface-variant"
+                                    >UPPER BODY / BACK</span
+                                >
+                            </div>
+                        </div>
+                        <span
+                            class="font-label-caps text-label-caps text-outline-variant"
+                            >04</span
+                        >
+                    </label>
+
+                    <!-- Exercise Item 5 -->
+                    <label
+                        class="group flex items-center justify-between py-stack-md border-b border-outline-variant cursor-pointer hover:bg-surface transition-colors duration-150 px-4 -mx-4 rounded-sm"
+                    >
+                        <div class="flex items-center gap-4">
+                            <div class="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    class="custom-checkbox opacity-0 absolute h-0 w-0"
+                                />
+                                <div
+                                    class="w-6 h-6 border-2 border-outline-variant rounded flex items-center justify-center transition-colors group-hover:border-primary"
+                                >
+                                    <svg
+                                        class="hidden w-4 h-4 text-background"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="3"
+                                            d="M5 13l4 4L19 7"
+                                        ></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="font-headline-md text-headline-md text-primary group-hover:text-primary transition-colors"
+                                    >ROWS</span
+                                >
+                                <span
+                                    class="font-label-caps text-label-caps text-on-surface-variant"
+                                    >UPPER BODY / BACK</span
+                                >
+                            </div>
+                        </div>
+                        <span
+                            class="font-label-caps text-label-caps text-outline-variant"
+                            >05</span
+                        >
+                    </label>
+
+                    <!-- Exercise Item 6 -->
+                    <label
+                        class="group flex items-center justify-between py-stack-md border-b border-outline-variant cursor-pointer hover:bg-surface transition-colors duration-150 px-4 -mx-4 rounded-sm"
+                    >
+                        <div class="flex items-center gap-4">
+                            <div class="relative flex items-center">
+                                <input
+                                    type="checkbox"
+                                    class="custom-checkbox opacity-0 absolute h-0 w-0"
+                                />
+                                <div
+                                    class="w-6 h-6 border-2 border-outline-variant rounded flex items-center justify-center transition-colors group-hover:border-primary"
+                                >
+                                    <svg
+                                        class="hidden w-4 h-4 text-background"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="3"
+                                            d="M5 13l4 4L19 7"
+                                        ></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="flex flex-col">
+                                <span
+                                    class="font-headline-md text-headline-md text-primary group-hover:text-primary transition-colors"
+                                    >OVERHEAD PRESS</span
+                                >
+                                <span
+                                    class="font-label-caps text-label-caps text-on-surface-variant"
+                                    >UPPER BODY / SHOULDERS</span
+                                >
+                            </div>
+                        </div>
+                        <span
+                            class="font-label-caps text-label-caps text-outline-variant"
+                            >06</span
+                        >
+                    </label>
+                </div>
+
+                <button
+                    class="mt-stack-md w-full bg-primary text-background font-headline-md text-headline-md py-4 rounded uppercase transition-colors hover:bg-on-surface-variant duration-150"
+                >
+                    SAVE WORKOUT
+                </button>
+            </section>
+        </main>
+    </body>
+</html>

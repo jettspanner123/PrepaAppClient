@@ -4,10 +4,21 @@ import StandardButtonComponent, {
 import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import HomeScreenCON from "@/app/Features/HomeScreen/Constants/HomeScreenCON";
+import { useRouter } from "expo-router";
 import React from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 
 export default function WorkoutScreenTodayCardStaticComponent(): React.JSX.Element {
+    const router = useRouter();
+
+    const handleViewAll = (): void => {
+        router.push("/workout-list");
+    };
+
+    const handleCreateWorkout = (): void => {
+        router.push("/create-workout");
+    };
+
     return (
         <View style={{ marginBottom: EdgeInsetsCON.XXL }}>
             {/* Section header */}
@@ -30,19 +41,24 @@ export default function WorkoutScreenTodayCardStaticComponent(): React.JSX.Eleme
                 >
                     {HomeScreenCON.WORKOUT_SECTION_LABEL}
                 </Text>
-                <Text
-                    style={{
-                        fontSize: 10,
-                        fontWeight: "700",
-                        color: ColorFactoryCON.MUTE,
-                        textTransform: "uppercase",
-                        letterSpacing: 1.5,
-                        borderBottomWidth: 1,
-                        borderBottomColor: ColorFactoryCON.CARD_BORDER,
-                    }}
+                <Pressable
+                    onPress={handleViewAll}
+                    hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}
                 >
-                    {HomeScreenCON.WORKOUT_VIEW_ALL}
-                </Text>
+                    <Text
+                        style={{
+                            fontSize: 10,
+                            fontWeight: "700",
+                            color: ColorFactoryCON.MUTE,
+                            textTransform: "uppercase",
+                            letterSpacing: 1.5,
+                            borderBottomWidth: 1,
+                            borderBottomColor: ColorFactoryCON.CARD_BORDER,
+                        }}
+                    >
+                        {HomeScreenCON.WORKOUT_VIEW_ALL}
+                    </Text>
+                </Pressable>
             </View>
 
             {/* Card — sharp corners */}
@@ -134,6 +150,31 @@ export default function WorkoutScreenTodayCardStaticComponent(): React.JSX.Eleme
                     fullWidth
                     borderRadius={0}
                     fontSize={12}
+                    fontWeight="700"
+                />
+            </View>
+
+            {/* Crave Something Else section */}
+            <View style={{ marginTop: EdgeInsetsCON.XXL }}>
+                <Text
+                    style={{
+                        fontSize: 11,
+                        fontWeight: "700",
+                        color: ColorFactoryCON.WHITE,
+                        textTransform: "uppercase",
+                        letterSpacing: 3,
+                        marginBottom: EdgeInsetsCON.LG,
+                    }}
+                >
+                    {HomeScreenCON.WORKOUT_CRAVE_LABEL}
+                </Text>
+                <StandardButtonComponent
+                    label={HomeScreenCON.WORKOUT_CREATE_CTA}
+                    onPress={handleCreateWorkout}
+                    variant={StandardButtonComponentVariant.DARK}
+                    fullWidth
+                    borderRadius={0}
+                    fontSize={13}
                     fontWeight="700"
                 />
             </View>

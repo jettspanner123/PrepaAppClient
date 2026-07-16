@@ -25,4 +25,11 @@ export default class EdgeInsetsCON {
     public static readonly CARD_CAP_HEIGHT: number = 24;
     /** FAB distance from bottom of screen */
     public static readonly FAB_BOTTOM: number = 24;
+
+    // ─── Shadow configurations ────────────────────────────────────────
+    public static readonly SHADOW_OFFSET_W: number = 0;
+    public static readonly SHADOW_OFFSET_H: number = 6;
+    public static readonly SHADOW_OPACITY: number = 0.6;
+    public static readonly SHADOW_RADIUS: number = 8;
+    public static readonly SHADOW_ELEVATION: number = 8;
 }

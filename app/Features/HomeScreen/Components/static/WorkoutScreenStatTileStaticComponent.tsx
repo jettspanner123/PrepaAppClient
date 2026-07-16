@@ -22,8 +22,11 @@ export default function WorkoutScreenStatTileStaticComponent({
                 borderWidth: 1,
                 borderColor: ColorFactoryCON.CARD_BORDER,
                 padding: EdgeInsetsCON.XL,
+                justifyContent: "space-between",
+                gap: EdgeInsetsCON.SM,
             }}
         >
+            {/* Label */}
             <Text
                 style={{
                     fontSize: 10,
@@ -31,36 +34,43 @@ export default function WorkoutScreenStatTileStaticComponent({
                     color: ColorFactoryCON.MUTE,
                     textTransform: "uppercase",
                     letterSpacing: 2,
-                    marginBottom: EdgeInsetsCON.XS,
                 }}
             >
                 {label}
             </Text>
+
+            {/* Value — large, takes most of the space */}
+            <Text
+                adjustsFontSizeToFit
+                numberOfLines={1}
+                style={{
+                    fontSize: 36,
+                    fontWeight: "900",
+                    color: ColorFactoryCON.WHITE,
+                    letterSpacing: -1,
+                    lineHeight: 36,
+                }}
+            >
+                {value}
+            </Text>
+
+            {/* Unit pill */}
             <View
                 style={{
-                    flexDirection: "row",
-                    alignItems: "baseline",
-                    gap: EdgeInsetsCON.XS,
+                    alignSelf: "flex-start",
+                    borderWidth: 1,
+                    borderColor: ColorFactoryCON.CARD_BORDER,
+                    paddingHorizontal: EdgeInsetsCON.SM,
+                    paddingVertical: EdgeInsetsCON.XXS,
                 }}
             >
                 <Text
                     style={{
-                        fontSize: 32,
-                        fontWeight: "900",
-                        color: ColorFactoryCON.WHITE,
-                        lineHeight: 32,
-                        letterSpacing: -0.5,
-                    }}
-                >
-                    {value}
-                </Text>
-                <Text
-                    style={{
-                        fontSize: 10,
+                        fontSize: 9,
                         fontWeight: "700",
                         color: ColorFactoryCON.MUTE,
                         textTransform: "uppercase",
-                        letterSpacing: 1.5,
+                        letterSpacing: 2,
                     }}
                 >
                     {unit}

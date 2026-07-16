@@ -36,6 +36,9 @@ export default class WorkoutEngineScreenCON {
     public static readonly MODAL_STOP_TITLE: string = "Stop Workout?";
     public static readonly MODAL_STOP_SUBTITLE: string =
         "This will end your session. All progress will be saved.";
+    public static readonly MODAL_COMPLETE_TITLE: string = "Complete Workout?";
+    public static readonly MODAL_COMPLETE_SUBTITLE: string =
+        "Are you sure you want to complete this workout? You won't be able to update it later.";
 
     public static readonly SESSION_TITLE_LINE1: string = "Workout";
     public static readonly SESSION_TITLE_LINE2: string = "Session";

@@ -6,9 +6,10 @@ import {
     Ionicons,
     MaterialCommunityIcons,
 } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text } from "react-native";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface NavigationBarItem {
@@ -41,10 +42,10 @@ function TabItem({
                 flex: 1,
                 alignItems: "center",
                 justifyContent: "center",
-                paddingVertical: EdgeInsetsCON.SM,
+                paddingVertical: EdgeInsetsCON.LG,
                 backgroundColor: isActive
                     ? ColorFactoryCON.WHITE
-                    : "transparent",
+                    : "rgba(0,0,0,0.3)",
                 opacity: pressed ? 0.6 : 1,
             }}
         >
@@ -80,7 +81,9 @@ export default function NavigationBarComponent({
     onPress,
 }: NavigationBarComponentProps): React.JSX.Element {
     return (
-        <View
+        <BlurView
+            intensity={60}
+            tint="dark"
             style={{
                 position: "absolute",
                 bottom: EdgeInsetsCON.LG,
@@ -88,9 +91,9 @@ export default function NavigationBarComponent({
                 right: EdgeInsetsCON.SCREEN_H,
                 flexDirection: "row",
                 alignItems: "stretch",
-                backgroundColor: ColorFactoryCON.BLACK,
                 borderWidth: 1,
                 borderColor: ColorFactoryCON.CARD_BORDER,
+                overflow: "hidden",
                 shadowColor: ColorFactoryCON.SHADOW,
                 shadowOffset: { width: 0, height: 8 },
                 shadowOpacity: 0.6,
@@ -106,7 +109,7 @@ export default function NavigationBarComponent({
                     onPress={() => onPress(item.key)}
                 />
             ))}
-        </View>
+        </BlurView>
     );
 }
 

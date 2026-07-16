@@ -20,13 +20,14 @@ export default function WorkoutScreenHeroStaticComponent(): React.JSX.Element {
                 {HomeScreenCON.WORKOUT_WELCOME_LABEL}
             </Text>
             <Text
+                numberOfLines={1}
                 style={{
-                    fontSize: 48,
+                    fontSize: 36,
                     fontWeight: "900",
                     color: ColorFactoryCON.WHITE,
                     textTransform: "uppercase",
-                    letterSpacing: -1,
-                    lineHeight: 52,
+                    letterSpacing: -0.5,
+                    lineHeight: 40,
                 }}
             >
                 {HomeScreenCON.WORKOUT_HERO_HEADLINE}

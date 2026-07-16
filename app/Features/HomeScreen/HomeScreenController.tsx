@@ -3,7 +3,6 @@ import NavigationBarComponent, {
     NavigationBarItem,
 } from "@/app/Components/Shared/NavigationBarComponent";
 import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
-import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import useHomeStateStore from "@/app/Store/HomeStateStore";
 import React, { useCallback, useEffect, useRef } from "react";
 import { Dimensions, ScrollView, View } from "react-native";
@@ -31,7 +30,7 @@ const NAV_ITEMS: NavigationBarItem[] = [
     { key: HomeScreenOptions.DIET, label: "Diet", icon: NavIcons.diet },
     {
         key: HomeScreenOptions.STATISTICS,
-        label: "Statistics",
+        label: "Stats",
         icon: NavIcons.statistics,
     },
     {
@@ -64,7 +63,7 @@ export default function HomeScreenController(): React.JSX.Element {
             style={{ flex: 1, backgroundColor: ColorFactoryCON.BLACK }}
             edges={[]}
         >
-            {/* Paged tab content — extra bottom padding so content clears the floating nav */}
+            {/* Full screen paged content */}
             <ScrollView
                 ref={scrollRef}
                 horizontal
@@ -72,12 +71,15 @@ export default function HomeScreenController(): React.JSX.Element {
                 scrollEnabled={false}
                 showsHorizontalScrollIndicator={false}
                 style={{ flex: 1 }}
-                contentContainerStyle={{
-                    paddingBottom: EdgeInsetsCON.SCROLL_BOTTOM_CLEARANCE,
-                }}
             >
                 {TABS.map((tab) => (
-                    <View key={tab} style={{ width: SCREEN_WIDTH, flex: 1 }}>
+                    <View
+                        key={tab}
+                        style={{
+                            width: SCREEN_WIDTH,
+                            flex: 1,
+                        }}
+                    >
                         {tab === HomeScreenOptions.WORKOUT && (
                             <WorkoutScreenController />
                         )}
@@ -94,7 +96,7 @@ export default function HomeScreenController(): React.JSX.Element {
                 ))}
             </ScrollView>
 
-            {/* Floating navigation bar */}
+            {/* Floating nav bar — absolutely positioned by NavigationBarComponent itself */}
             <View
                 style={{
                     position: "absolute",
