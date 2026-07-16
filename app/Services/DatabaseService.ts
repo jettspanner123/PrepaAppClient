@@ -8,6 +8,13 @@ export interface WorkoutData {
     createdAt?: number;
 }
 
+export interface ExerciseData {
+    name: string;
+    muscleGroup: string;
+    category: string;
+    createdAt?: number;
+}
+
 export default class DatabaseService {
     private static instance: DatabaseService;
 
@@ -21,6 +28,19 @@ export default class DatabaseService {
             DatabaseService.instance = new DatabaseService();
         }
         return DatabaseService.instance;
+    }
+
+    /**
+     * Save a new exercise for user jettspanner123 to the Realtime Database
+     */
+    public async saveExercise(exercise: ExerciseData): Promise<string> {
+        const exercisesRef = ref(database, "users/jettspanner123/exercises");
+        const newExerciseRef = push(exercisesRef);
+        await set(newExerciseRef, {
+            ...exercise,
+            createdAt: Date.now(),
+        });
+        return newExerciseRef.key || "";
     }
 
     /**
@@ -47,6 +67,18 @@ export default class DatabaseService {
         const snapshot = await get(workoutsRef);
         if (snapshot.exists()) {
             return snapshot.val() as Record<string, WorkoutData>;
+        }
+        return null;
+    }
+
+    /**
+     * Fetch all saved exercises for user jettspanner123 from the Realtime Database
+     */
+    public async getExercises(): Promise<Record<string, ExerciseData> | null> {
+        const exercisesRef = ref(database, "users/jettspanner123/exercises");
+        const snapshot = await get(exercisesRef);
+        if (snapshot.exists()) {
+            return snapshot.val() as Record<string, ExerciseData>;
         }
         return null;
     }

@@ -8,16 +8,20 @@ import ExerciseLibraryCON from "@/app/Constants/ExerciseLibraryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import * as Haptics from "expo-haptics";
 import { useRouter, useNavigation } from "expo-router";
+import { BlurView } from "expo-blur";
 import React, { useEffect, useMemo, useState } from "react";
 import {
+    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    StyleSheet,
     Text,
     TextInput,
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import DatabaseService from "@/app/Services/DatabaseService";
 import CreateExerciseScreenCON from "./Constants/CreateExerciseScreenCON";
 import CreateExerciseScreenMuscleGridStaticComponent from "./Components/static/CreateExerciseScreenMuscleGridStaticComponent";
 import CreateExerciseScreenEquipmentGridStaticComponent from "./Components/static/CreateExerciseScreenEquipmentGridStaticComponent";
@@ -34,6 +38,9 @@ export default function CreateExerciseScreenController(): React.JSX.Element {
 
     // States for discard confirmation
     const [showDiscardModal, setShowDiscardModal] = useState<boolean>(false);
+    const [showSaveModal, setShowSaveModal] = useState<boolean>(false);
+    const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
+    const [isSaving, setIsSaving] = useState<boolean>(false);
     const [pendingAction, setPendingAction] = useState<any>(null);
 
     // Block back navigation if exercise name is not empty
@@ -83,16 +90,44 @@ export default function CreateExerciseScreenController(): React.JSX.Element {
 
     const handleSave = (): void => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        console.log("Saving Exercise:", {
-            name: exerciseName,
-            muscleGroup: selectedGroup,
-            category: selectedCategory,
-        });
-        // Clear name to bypass the beforeRemove listener
-        setExerciseName("");
-        setTimeout(() => {
-            router.back();
-        }, 50);
+        setShowSaveModal(true);
+    };
+
+    const handleConfirmSave = async (): Promise<void> => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        setShowSaveModal(false);
+
+        if (!selectedGroup || !selectedCategory) {
+            return;
+        }
+
+        setIsSaving(true);
+
+        try {
+            const exercisePayload = {
+                name: exerciseName,
+                muscleGroup: selectedGroup,
+                category: selectedCategory,
+            };
+            console.log(
+                "Saving exact object to RTDB:",
+                JSON.stringify(exercisePayload, null, 2),
+            );
+
+            await DatabaseService.getInstance().saveExercise(exercisePayload);
+
+            // On success, go back
+            setExerciseName(""); // clear input to bypass beforeRemove check
+            setTimeout(() => {
+                router.back();
+            }, 50);
+        } catch (error) {
+            console.error("Error saving exercise to RTDB:", error);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            setShowErrorModal(true);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     // Dynamically pull all unique muscle groups from the exercise library
@@ -271,16 +306,64 @@ export default function CreateExerciseScreenController(): React.JSX.Element {
                         right: EdgeInsetsCON.SCREEN_H,
                     }}
                 >
-                    <StandardButtonComponent
-                        label={CreateExerciseScreenCON.CTA_SAVE}
-                        onPress={handleSave}
-                        variant={StandardButtonComponentVariant.WHITE}
-                        fullWidth
-                        borderRadius={0}
-                        fontSize={16}
-                        fontWeight="900"
-                        disabled={isSaveDisabled}
-                    />
+                    {isSaving ? (
+                        <View
+                            style={{
+                                width: "100%",
+                                paddingVertical: EdgeInsetsCON.LG,
+                                backgroundColor: ColorFactoryCON.WHITE,
+                                borderRadius: 0,
+                                alignItems: "center",
+                                justifyContent: "center",
+                            }}
+                        >
+                            <ActivityIndicator
+                                color={ColorFactoryCON.INK}
+                                size="small"
+                            />
+                        </View>
+                    ) : isSaveDisabled ? (
+                        <View
+                            style={{
+                                width: "100%",
+                                paddingVertical: EdgeInsetsCON.LG,
+                                borderWidth: 1,
+                                borderColor: ColorFactoryCON.CARD_BORDER,
+                                borderRadius: 0,
+                                overflow: "hidden",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "rgba(255, 255, 255, 0.12)",
+                            }}
+                        >
+                            <BlurView
+                                intensity={95}
+                                tint="light"
+                                style={StyleSheet.absoluteFillObject}
+                            />
+                            <Text
+                                style={{
+                                    fontSize: 16,
+                                    fontWeight: "900",
+                                    color: ColorFactoryCON.BLACK,
+                                    textTransform: "uppercase",
+                                    letterSpacing: 0.5,
+                                }}
+                            >
+                                {CreateExerciseScreenCON.CTA_SAVE}
+                            </Text>
+                        </View>
+                    ) : (
+                        <StandardButtonComponent
+                            label={CreateExerciseScreenCON.CTA_SAVE}
+                            onPress={handleSave}
+                            variant={StandardButtonComponentVariant.WHITE}
+                            fullWidth
+                            borderRadius={0}
+                            fontSize={16}
+                            fontWeight="900"
+                        />
+                    )}
                 </View>
             </View>
 
@@ -293,6 +376,31 @@ export default function CreateExerciseScreenController(): React.JSX.Element {
                 cancelLabel="Cancel"
                 onConfirm={handleConfirmDiscard}
                 onCancel={handleCancelDiscard}
+            />
+
+            {/* Save Confirmation Modal */}
+            <StandardConfirmationModalComponent
+                visible={showSaveModal}
+                title="Save Exercise?"
+                subtitle="Are you sure you want to save this new exercise?"
+                confirmLabel="Save"
+                cancelLabel="Cancel"
+                onConfirm={handleConfirmSave}
+                onCancel={() => setShowSaveModal(false)}
+            />
+
+            {/* Error Confirmation Modal */}
+            <StandardConfirmationModalComponent
+                visible={showErrorModal}
+                title="Error Saving Exercise"
+                subtitle="An error occurred while saving your exercise to the database. Please try again."
+                confirmLabel="Try Again"
+                cancelLabel="Close"
+                onConfirm={() => {
+                    setShowErrorModal(false);
+                    setShowSaveModal(true);
+                }}
+                onCancel={() => setShowErrorModal(false)}
             />
         </SafeAreaView>
     );

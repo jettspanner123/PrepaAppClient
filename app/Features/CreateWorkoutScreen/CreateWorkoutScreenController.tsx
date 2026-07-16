@@ -7,8 +7,10 @@ import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import ExerciseLibraryCON from "@/app/Constants/ExerciseLibraryCON";
 import CreateWorkoutScreenCON from "@/app/Features/CreateWorkoutScreen/Constants/CreateWorkoutScreenCON";
+import useUserCustomDataStateStore from "@/app/Store/UserCustomDataStateStore";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
+import { BlurView } from "expo-blur";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
     Animated,
@@ -16,6 +18,7 @@ import {
     Platform,
     Pressable,
     ScrollView,
+    StyleSheet,
     Text,
     TextInput,
     View,
@@ -88,9 +91,29 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
         outputRange: [0, EdgeInsetsCON.SM],
     });
 
+    const customExercises = useUserCustomDataStateStore(
+        (state) => state.customExercises,
+    );
+
+    const allExercises = useMemo(() => {
+        const staticList = ExerciseLibraryCON.EXERCISES;
+        if (!customExercises) {
+            return staticList;
+        }
+
+        const customList = Object.entries(customExercises).map(([id, data]) => ({
+            id,
+            name: data.name,
+            muscleGroup: data.muscleGroup,
+            category: data.category,
+        }));
+
+        return [...staticList, ...customList];
+    }, [customExercises]);
+
     const filteredExercises = useMemo(() => {
         const q = searchQuery.trim().toLowerCase();
-        let list = ExerciseLibraryCON.EXERCISES.filter(
+        let list = allExercises.filter(
             (ex) => ex.muscleGroup.toLowerCase() === activeGroup.toLowerCase(),
         );
         if (!q) return list;
@@ -100,7 +123,7 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                 ex.muscleGroup.toLowerCase().includes(q) ||
                 ex.category.toLowerCase().includes(q),
         );
-    }, [searchQuery, activeGroup]);
+    }, [searchQuery, activeGroup, allExercises]);
 
     const handleToggle = (id: string): void => {
         setSelectedIds((prev) => {
@@ -118,6 +141,8 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
         console.log("Saving workout:", workoutName, Array.from(selectedIds));
         // TODO: persist
     };
+
+    const isSaveDisabled = !workoutName.trim() || selectedIds.size === 0;
 
     return (
         <SafeAreaView
@@ -255,7 +280,7 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                                 }}
                             >
                                 {selectedIds.size}/
-                                {ExerciseLibraryCON.EXERCISES.length} SELECTED
+                                {allExercises.length} SELECTED
                             </Text>
                         </View>
 
@@ -385,7 +410,7 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                                     paddingBottom: EdgeInsetsCON.LG,
                                 }}
                             >
-                                {ExerciseLibraryCON.EXERCISES.filter((ex) =>
+                                {allExercises.filter((ex) =>
                                     selectedIds.has(ex.id),
                                 ).map((ex) => (
                                     <Pressable
@@ -462,16 +487,48 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                         right: EdgeInsetsCON.SCREEN_H,
                     }}
                 >
-                    <StandardButtonComponent
-                        label={CreateWorkoutScreenCON.CTA_SAVE}
-                        onPress={handleSave}
-                        variant={StandardButtonComponentVariant.WHITE}
-                        fullWidth
-                        borderRadius={0}
-                        fontSize={16}
-                        fontWeight="900"
-                        disabled={!workoutName.trim() || selectedIds.size === 0}
-                    />
+                    {isSaveDisabled ? (
+                        <View
+                            style={{
+                                width: "100%",
+                                paddingVertical: EdgeInsetsCON.LG,
+                                borderWidth: 1,
+                                borderColor: ColorFactoryCON.CARD_BORDER,
+                                borderRadius: 0,
+                                overflow: "hidden",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                backgroundColor: "rgba(255, 255, 255, 0.12)",
+                            }}
+                        >
+                            <BlurView
+                                intensity={95}
+                                tint="light"
+                                style={StyleSheet.absoluteFillObject}
+                            />
+                            <Text
+                                style={{
+                                    fontSize: 16,
+                                    fontWeight: "900",
+                                    color: ColorFactoryCON.BLACK,
+                                    textTransform: "uppercase",
+                                    letterSpacing: 0.5,
+                                }}
+                            >
+                                {CreateWorkoutScreenCON.CTA_SAVE}
+                            </Text>
+                        </View>
+                    ) : (
+                        <StandardButtonComponent
+                            label={CreateWorkoutScreenCON.CTA_SAVE}
+                            onPress={handleSave}
+                            variant={StandardButtonComponentVariant.WHITE}
+                            fullWidth
+                            borderRadius={0}
+                            fontSize={16}
+                            fontWeight="900"
+                        />
+                    )}
                 </View>
             </View>
         </SafeAreaView>
