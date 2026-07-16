@@ -35,7 +35,13 @@ interface ApplicationStickyToolbarProps {
     actions?: ToolbarAction[];
 }
 
-function ActionButton({ action }: { action: ToolbarAction }): React.JSX.Element {
+function ActionButton({
+    action,
+    onPress,
+}: {
+    action: ToolbarAction;
+    onPress: (callback: () => void) => void;
+}): React.JSX.Element {
     const [pressed, setPressed] = useState<boolean>(false);
 
     return (
@@ -45,7 +51,7 @@ function ActionButton({ action }: { action: ToolbarAction }): React.JSX.Element 
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
             onPressOut={() => setPressed(false)}
-            onPress={action.onPress}
+            onPress={() => onPress(action.onPress)}
             style={{
                 flex: 1,
                 flexDirection: "row",
@@ -99,6 +105,14 @@ export default function ApplicationStickyToolbar({
         if (onRightPress) {
             onRightPress();
         }
+    };
+
+    const handleActionPress = (actionOnPress: () => void): void => {
+        // Collapse the toolbar first with animation
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setIsExpanded(false);
+        // Execute original action
+        actionOnPress();
     };
 
     return (
@@ -198,7 +212,11 @@ export default function ApplicationStickyToolbar({
                     }}
                 >
                     {actions.map((action, index) => (
-                        <ActionButton key={index} action={action} />
+                        <ActionButton
+                            key={index}
+                            action={action}
+                            onPress={handleActionPress}
+                        />
                     ))}
                 </View>
             )}
