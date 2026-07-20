@@ -88,6 +88,7 @@ export default function NavigationBarComponent({
             style={{
                 position: "absolute",
                 bottom: EdgeInsetsCON.LG,
+                marginBottom: 10,
                 left: EdgeInsetsCON.SCREEN_H,
                 right: EdgeInsetsCON.SCREEN_H,
                 flexDirection: "row",

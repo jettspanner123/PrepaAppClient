@@ -1,19 +1,4 @@
-export interface WorkoutSet {
-    id: string;
-    setNumber: number;
-    totalSets: number;
-    weightPlaceholder: string;
-    repsPlaceholder: string;
-    completed: boolean;
-}
-
-export interface WorkoutExercise {
-    id: string;
-    index: number;
-    category: string;
-    name: string;
-    sets: WorkoutSet[];
-}
+import { WorkoutExerciseType } from "@/app/Types/WorkoutExerciseType";
 
 export default class WorkoutEngineScreenCON {
     public static readonly PAGE_NAME: string = "WorkoutEngineScreen";
@@ -43,7 +28,7 @@ export default class WorkoutEngineScreenCON {
     public static readonly SESSION_TITLE_LINE1: string = "Workout";
     public static readonly SESSION_TITLE_LINE2: string = "Session";
 
-    public static readonly EXERCISES: WorkoutExercise[] = [
+    public static readonly EXERCISES: WorkoutExerciseType[] = [
         {
             id: "1",
             index: 1,

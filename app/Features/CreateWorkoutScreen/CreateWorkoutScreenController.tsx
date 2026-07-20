@@ -8,9 +8,9 @@ import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import ExerciseLibraryCON from "@/app/Constants/ExerciseLibraryCON";
 import CreateWorkoutScreenCON from "@/app/Features/CreateWorkoutScreen/Constants/CreateWorkoutScreenCON";
 import useUserCustomDataStateStore from "@/app/Store/UserCustomDataStateStore";
+import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import { BlurView } from "expo-blur";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
     Animated,
@@ -101,12 +101,14 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
             return staticList;
         }
 
-        const customList = Object.entries(customExercises).map(([id, data]) => ({
-            id,
-            name: data.name,
-            muscleGroup: data.muscleGroup,
-            category: data.category,
-        }));
+        const customList = Object.entries(customExercises).map(
+            ([id, data]) => ({
+                id,
+                name: data.name,
+                muscleGroup: data.muscleGroup,
+                category: data.category,
+            }),
+        );
 
         return [...staticList, ...customList];
     }, [customExercises]);
@@ -279,8 +281,8 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                                     textTransform: "uppercase",
                                 }}
                             >
-                                {selectedIds.size}/
-                                {allExercises.length} SELECTED
+                                {selectedIds.size}/{allExercises.length}{" "}
+                                SELECTED
                             </Text>
                         </View>
 
@@ -410,47 +412,49 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
                                     paddingBottom: EdgeInsetsCON.LG,
                                 }}
                             >
-                                {allExercises.filter((ex) =>
-                                    selectedIds.has(ex.id),
-                                ).map((ex) => (
-                                    <Pressable
-                                        key={ex.id}
-                                        onPress={() => handleToggle(ex.id)}
-                                        style={{
-                                            flexDirection: "row",
-                                            alignItems: "center",
-                                            gap: EdgeInsetsCON.XS,
-                                            paddingHorizontal: EdgeInsetsCON.LG,
-                                            paddingVertical: EdgeInsetsCON.SM,
-                                            backgroundColor:
-                                                ColorFactoryCON.CARD_BG_LIGHT_PRESSED,
-                                            borderWidth: 1,
-                                            borderColor:
-                                                ColorFactoryCON.SUCCESS,
-                                        }}
-                                    >
-                                        <Text
+                                {allExercises
+                                    .filter((ex) => selectedIds.has(ex.id))
+                                    .map((ex) => (
+                                        <Pressable
+                                            key={ex.id}
+                                            onPress={() => handleToggle(ex.id)}
                                             style={{
-                                                fontSize: 11,
-                                                fontWeight: "700",
-                                                color: ColorFactoryCON.SUCCESS,
-                                                textTransform: "uppercase",
-                                                letterSpacing: 1.5,
+                                                flexDirection: "row",
+                                                alignItems: "center",
+                                                gap: EdgeInsetsCON.XS,
+                                                paddingHorizontal:
+                                                    EdgeInsetsCON.LG,
+                                                paddingVertical:
+                                                    EdgeInsetsCON.SM,
+                                                backgroundColor:
+                                                    ColorFactoryCON.CARD_BG_LIGHT_PRESSED,
+                                                borderWidth: 1,
+                                                borderColor:
+                                                    ColorFactoryCON.SUCCESS,
                                             }}
                                         >
-                                            {ex.name}
-                                        </Text>
-                                        <Text
-                                            style={{
-                                                fontSize: 11,
-                                                fontWeight: "700",
-                                                color: ColorFactoryCON.SUCCESS,
-                                            }}
-                                        >
-                                            ✕
-                                        </Text>
-                                    </Pressable>
-                                ))}
+                                            <Text
+                                                style={{
+                                                    fontSize: 11,
+                                                    fontWeight: "700",
+                                                    color: ColorFactoryCON.SUCCESS,
+                                                    textTransform: "uppercase",
+                                                    letterSpacing: 1.5,
+                                                }}
+                                            >
+                                                {ex.name}
+                                            </Text>
+                                            <Text
+                                                style={{
+                                                    fontSize: 11,
+                                                    fontWeight: "700",
+                                                    color: ColorFactoryCON.SUCCESS,
+                                                }}
+                                            >
+                                                ✕
+                                            </Text>
+                                        </Pressable>
+                                    ))}
                             </ScrollView>
                         )}
 

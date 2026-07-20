@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     },
     GRID_ITEM: {
         width: "48.5%",
-        height: 80,
+        paddingVertical: EdgeInsetsCON.MD,
         borderWidth: 1,
         borderRadius: 0,
         alignItems: "center",
@@ -75,11 +75,10 @@ const styles = StyleSheet.create({
         backgroundColor: ColorFactoryCON.WHITE,
     },
     GRID_TEXT: {
-        fontFamily: "Anton",
-        fontSize: 18,
-        fontWeight: "900",
+        fontSize: 12,
+        fontWeight: "700",
         textTransform: "uppercase",
-        letterSpacing: 2,
+        letterSpacing: 1.5,
     },
     GRID_TEXT_UNSELECTED: {
         color: ColorFactoryCON.WHITE,

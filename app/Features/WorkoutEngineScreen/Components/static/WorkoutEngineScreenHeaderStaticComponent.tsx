@@ -1,11 +1,13 @@
 import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import WorkoutEngineScreenCON from "@/app/Features/WorkoutEngineScreen/Constants/WorkoutEngineScreenCON";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Text, View } from "react-native";
 
 interface WorkoutEngineScreenHeaderStaticComponentProps {
     isRunning: boolean;
+    elapsed: number;
+    onTick: () => void;
     titleLine1?: string;
     titleLine2?: string;
 }
@@ -20,18 +22,16 @@ function formatTime(seconds: number): string {
 
 export default function WorkoutEngineScreenHeaderStaticComponent({
     isRunning,
+    elapsed,
+    onTick,
     titleLine1 = WorkoutEngineScreenCON.SESSION_TITLE_LINE1,
     titleLine2 = WorkoutEngineScreenCON.SESSION_TITLE_LINE2,
 }: WorkoutEngineScreenHeaderStaticComponentProps): React.JSX.Element {
-    const [elapsed, setElapsed] = useState<number>(0);
-
     useEffect(() => {
         if (!isRunning) return;
-        const interval = setInterval(() => {
-            setElapsed((prev) => prev + 1);
-        }, 1000);
+        const interval = setInterval(onTick, 1000);
         return () => clearInterval(interval);
-    }, [isRunning]);
+    }, [isRunning, onTick]);
 
     return (
         <View

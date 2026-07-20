@@ -5,16 +5,16 @@ import StandardButtonComponent, {
 import StandardConfirmationModalComponent from "@/app/Components/Shared/StandardConfirmationModalComponent";
 import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
-import WorkoutEngineScreenCON, {
-    WorkoutExercise,
-    WorkoutSet,
-} from "@/app/Features/WorkoutEngineScreen/Constants/WorkoutEngineScreenCON";
+import WorkoutEngineScreenCON from "@/app/Features/WorkoutEngineScreen/Constants/WorkoutEngineScreenCON";
 import WorkoutListScreenCON from "@/app/Features/WorkoutListScreen/Constants/WorkoutListScreenCON";
+import DatabaseService from "@/app/Services/DatabaseService";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { WorkoutExerciseType } from "@/app/Types/WorkoutExerciseType";
+import { WorkoutSetType } from "@/app/Types/WorkoutSetType";
 import WorkoutEngineScreenExerciseCardStaticComponent from "./Components/static/WorkoutEngineScreenExerciseCardStaticComponent";
 import WorkoutEngineScreenHeaderStaticComponent from "./Components/static/WorkoutEngineScreenHeaderStaticComponent";
 
@@ -93,7 +93,7 @@ function FABButton({
 }
 
 // ─── Build exercises from WorkoutListScreenCON ───────────────────────────────
-function buildExercises(workoutId: string): WorkoutExercise[] {
+function buildExercises(workoutId: string): WorkoutExerciseType[] {
     const workout = WorkoutListScreenCON.WORKOUTS.find(
         (w) => w.id === workoutId,
     );
@@ -128,11 +128,17 @@ export default function WorkoutEngineScreenController(): React.JSX.Element {
     const [startModalVisible, setStartModalVisible] = useState<boolean>(false);
     const [stopModalVisible, setStopModalVisible] = useState<boolean>(false);
     const [completeModalVisible, setCompleteModalVisible] = useState<boolean>(false);
-    const [exercises, setExercises] = useState<WorkoutExercise[]>(() =>
+    const [elapsed, setElapsed] = useState<number>(0);
+    const [exercises, setExercises] = useState<WorkoutExerciseType[]>(() =>
         buildExercises(id ?? ""),
     );
 
     const isRunning = sessionState === "running";
+
+    // Stable tick callback — increments elapsed only while running
+    const handleTick = useCallback((): void => {
+        setElapsed((prev) => prev + 1);
+    }, []);
 
     useEffect(() => {
         navigation.setOptions({
@@ -158,7 +164,7 @@ export default function WorkoutEngineScreenController(): React.JSX.Element {
                 if (exercise.id !== exerciseId) return exercise;
                 const newSetNumber = exercise.sets.length + 1;
                 const lastSet = exercise.sets[exercise.sets.length - 1];
-                const newSet: WorkoutSet = {
+                const newSet: WorkoutSetType = {
                     id: `${exerciseId}-${newSetNumber}`,
                     setNumber: newSetNumber,
                     totalSets: newSetNumber,
@@ -206,10 +212,44 @@ export default function WorkoutEngineScreenController(): React.JSX.Element {
         setCompleteModalVisible(true);
     };
 
-    const handleCompleteConfirm = (): void => {
-        setCompleteModalVisible(false);
-        setSessionState("idle");
-        router.back();
+    const handleCompleteConfirm = async (): Promise<void> => {
+        const totalCompletedSets = exercises.reduce(
+            (total, exercise) =>
+                total + exercise.sets.filter((s) => s.completed).length,
+            0,
+        );
+
+        if (totalCompletedSets === 0) {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+            Alert.alert(
+                "Empty Session",
+                "You haven't completed any sets! Please complete at least one set before saving, or use the Stop button to exit.",
+                [{ text: "OK", onPress: () => setCompleteModalVisible(false) }],
+            );
+            return;
+        }
+
+        try {
+            const sessionPayload = {
+                workoutId: id ?? "unknown",
+                workoutName: titleLine1,
+                exercises: exercises,
+                durationSeconds: elapsed,
+            };
+            console.log(
+                "Saving workout session to RTDB:",
+                JSON.stringify(sessionPayload, null, 2),
+            );
+            await DatabaseService.getInstance().saveWorkoutSession(sessionPayload);
+            
+            setCompleteModalVisible(false);
+            setSessionState("idle");
+            router.back();
+        } catch (error) {
+            console.error("Error saving workout session to RTDB:", error);
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+            setCompleteModalVisible(false);
+        }
     };
 
     // ─── Dynamic title lines ──────────────────────────────────────────
@@ -237,6 +277,8 @@ export default function WorkoutEngineScreenController(): React.JSX.Element {
                 />
                 <WorkoutEngineScreenHeaderStaticComponent
                     isRunning={isRunning}
+                    elapsed={elapsed}
+                    onTick={handleTick}
                     titleLine1={titleLine1}
                     titleLine2={titleLine2}
                 />

@@ -1,19 +1,8 @@
 import { database } from "@/app/Configurations/FirebaseConfiguration";
+import { ExerciseDataType } from "@/app/Types/ExerciseDataType";
+import { WorkoutDataType } from "@/app/Types/WorkoutDataType";
+import { WorkoutSessionDataType } from "@/app/Types/WorkoutSessionDataType";
 import { get, push, ref, remove, set } from "firebase/database";
-
-export interface WorkoutData {
-    name: string;
-    weekDay: string | null;
-    exercises: string[];
-    createdAt?: number;
-}
-
-export interface ExerciseData {
-    name: string;
-    muscleGroup: string;
-    category: string;
-    createdAt?: number;
-}
 
 export default class DatabaseService {
     private static instance: DatabaseService;
@@ -33,7 +22,7 @@ export default class DatabaseService {
     /**
      * Save a new exercise for user jettspanner123 to the Realtime Database
      */
-    public async saveExercise(exercise: ExerciseData): Promise<string> {
+    public async saveExercise(exercise: ExerciseDataType): Promise<string> {
         const exercisesRef = ref(database, "users/jettspanner123/exercises");
         const newExerciseRef = push(exercisesRef);
         await set(newExerciseRef, {
@@ -48,7 +37,7 @@ export default class DatabaseService {
      * @param workout The workout details to persist
      * @returns The generated key of the new workout
      */
-    public async saveWorkout(workout: WorkoutData): Promise<string> {
+    public async saveWorkout(workout: WorkoutDataType): Promise<string> {
         const workoutsRef = ref(database, "workouts");
         const newWorkoutRef = push(workoutsRef);
         await set(newWorkoutRef, {
@@ -59,14 +48,27 @@ export default class DatabaseService {
     }
 
     /**
+     * Save a completed workout session log to the Realtime Database
+     */
+    public async saveWorkoutSession(session: WorkoutSessionDataType): Promise<string> {
+        const sessionsRef = ref(database, "users/jettspanner123/sessions");
+        const newSessionRef = push(sessionsRef);
+        await set(newSessionRef, {
+            ...session,
+            completedAt: Date.now(),
+        });
+        return newSessionRef.key || "";
+    }
+
+    /**
      * Fetch all saved workouts from the Realtime Database
      * @returns Record object of workouts or null
      */
-    public async getWorkouts(): Promise<Record<string, WorkoutData> | null> {
+    public async getWorkouts(): Promise<Record<string, WorkoutDataType> | null> {
         const workoutsRef = ref(database, "workouts");
         const snapshot = await get(workoutsRef);
         if (snapshot.exists()) {
-            return snapshot.val() as Record<string, WorkoutData>;
+            return snapshot.val() as Record<string, WorkoutDataType>;
         }
         return null;
     }
@@ -74,11 +76,11 @@ export default class DatabaseService {
     /**
      * Fetch all saved exercises for user jettspanner123 from the Realtime Database
      */
-    public async getExercises(): Promise<Record<string, ExerciseData> | null> {
+    public async getExercises(): Promise<Record<string, ExerciseDataType> | null> {
         const exercisesRef = ref(database, "users/jettspanner123/exercises");
         const snapshot = await get(exercisesRef);
         if (snapshot.exists()) {
-            return snapshot.val() as Record<string, ExerciseData>;
+            return snapshot.val() as Record<string, ExerciseDataType>;
         }
         return null;
     }
@@ -90,5 +92,49 @@ export default class DatabaseService {
     public async deleteWorkout(workoutId: string): Promise<void> {
         const workoutRef = ref(database, `workouts/${workoutId}`);
         await remove(workoutRef);
+    }
+
+    /**
+     * Update an existing exercise for user jettspanner123 in the Realtime Database
+     * @param exerciseId The Firebase key of the exercise to update
+     * @param exercise The updated exercise payload
+     */
+    public async updateExercise(exerciseId: string, exercise: ExerciseDataType): Promise<void> {
+        const exerciseRef = ref(database, `users/jettspanner123/exercises/${exerciseId}`);
+        await set(exerciseRef, {
+            ...exercise,
+            updatedAt: Date.now(),
+        });
+    }
+
+    /**
+     * Delete a custom exercise for user jettspanner123 from the Realtime Database
+     * @param exerciseId The Firebase key of the exercise to delete
+     */
+    public async deleteExercise(exerciseId: string): Promise<void> {
+        const exerciseRef = ref(database, `users/jettspanner123/exercises/${exerciseId}`);
+        await remove(exerciseRef);
+    }
+
+    /**
+     * Fetch the weekly schedule for user jettspanner123 from the Realtime Database
+     */
+    public async getSchedule(): Promise<Record<string, string> | null> {
+        const scheduleRef = ref(database, "users/jettspanner123/schedule");
+        const snapshot = await get(scheduleRef);
+        if (snapshot.exists()) {
+            return snapshot.val() as Record<string, string>;
+        }
+        return null;
+    }
+
+    /**
+     * Save/update the workout assignment for a specific day in user jettspanner123's schedule
+     * @param dayId The ID of the day (e.g., 'mon', 'tue')
+     * @param workoutId The unique ID of the assigned workout
+     */
+    public async saveScheduleDay(dayId: string, workoutId: string): Promise<void> {
+        const dayRef = ref(database, `users/jettspanner123/schedule/${dayId}`);
+        await set(dayRef, workoutId);
     }
 }

@@ -92,6 +92,7 @@ Add your rules below. Kiro will follow these before writing any code.
 
 ## Naming
 
+- (e.g. Keep all the types in their separate file in the `app/Types` folder. They should have a name of file and type that ends with `*Type`, e.g. `WorkoutDataType` inside `WorkoutDataType.ts`.)
 - (e.g. If a component that will have other Components in it should have the name `*ScreenController`, and should be in PascalCase, example, fileName: HomeScreenController.tsx, componentName: HomeScreenController)
 - (e.g. If a component that does not have any other component in it should have the name `*ScreenComponent`, and should be in PascalCase, fileName: ButtonComponent.tsx, componentName: ButtonComponent)
 - (e.g. All the constants should be stored in the `app/features/${folderName}/Constants`)

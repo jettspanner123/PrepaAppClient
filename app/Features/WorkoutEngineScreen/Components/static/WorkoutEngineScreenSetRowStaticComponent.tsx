@@ -1,16 +1,15 @@
 import StandardConfirmationModalComponent from "@/app/Components/Shared/StandardConfirmationModalComponent";
 import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
-import WorkoutEngineScreenCON, {
-    WorkoutSet,
-} from "@/app/Features/WorkoutEngineScreen/Constants/WorkoutEngineScreenCON";
+import WorkoutEngineScreenCON from "@/app/Features/WorkoutEngineScreen/Constants/WorkoutEngineScreenCON";
+import { WorkoutSetType } from "@/app/Types/WorkoutSetType";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import React, { useState } from "react";
 import { Pressable, Text, TextInput, View } from "react-native";
 
 interface WorkoutEngineScreenSetRowStaticComponentProps {
-    set: WorkoutSet;
+    set: WorkoutSetType;
     onComplete: (setId: string) => void;
 }
 

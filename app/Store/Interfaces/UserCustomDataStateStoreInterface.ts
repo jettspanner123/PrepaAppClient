@@ -1,8 +1,8 @@
-import { ExerciseData } from "@/app/Services/DatabaseService";
+import { ExerciseDataType } from "@/app/Types/ExerciseDataType";
 
 export default interface UserCustomDataStateStoreInterface {
-    customExercises: Record<string, ExerciseData> | null;
+    customExercises: Record<string, ExerciseDataType> | null;
     setCustomExercises: (
-        customExercises: Record<string, ExerciseData> | null,
+        customExercises: Record<string, ExerciseDataType> | null,
     ) => void;
 }

@@ -1,15 +1,14 @@
 import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
-import WorkoutEngineScreenCON, {
-    WorkoutExercise,
-} from "@/app/Features/WorkoutEngineScreen/Constants/WorkoutEngineScreenCON";
+import WorkoutEngineScreenCON from "@/app/Features/WorkoutEngineScreen/Constants/WorkoutEngineScreenCON";
+import { WorkoutExerciseType } from "@/app/Types/WorkoutExerciseType";
 import * as Haptics from "expo-haptics";
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import WorkoutEngineScreenSetRowStaticComponent from "./WorkoutEngineScreenSetRowStaticComponent";
 
 interface WorkoutEngineScreenExerciseCardStaticComponentProps {
-    exercise: WorkoutExercise;
+    exercise: WorkoutExerciseType;
     onSetComplete: (setId: string) => void;
     onAddSet: (exerciseId: string) => void;
 }
