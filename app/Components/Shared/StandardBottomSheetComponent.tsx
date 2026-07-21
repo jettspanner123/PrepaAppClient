@@ -3,10 +3,11 @@ import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
     Animated,
     Dimensions,
+    LayoutAnimation,
     Modal,
     PanResponder,
     Pressable,
@@ -17,12 +18,74 @@ import {
 
 const SCREEN_HEIGHT = Dimensions.get("screen").height;
 
+export interface BottomSheetAction {
+    label: string;
+    onPress: () => void;
+    icon?: string;
+}
+
 interface StandardBottomSheetComponentProps {
     visible: boolean;
     title: string;
     onClose: () => void;
     children: React.ReactNode;
     height?: string | number; // default '85%'
+    rightIconType?: "more" | "none";
+    onRightPress?: () => void;
+    actions?: BottomSheetAction[];
+}
+
+function ActionButton({
+    action,
+    onPress,
+}: {
+    action: BottomSheetAction;
+    onPress: (callback: () => void) => void;
+}): React.JSX.Element {
+    const [pressed, setPressed] = useState<boolean>(false);
+
+    return (
+        <Pressable
+            onPressIn={() => {
+                setPressed(true);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            onPressOut={() => setPressed(false)}
+            onPress={() => onPress(action.onPress)}
+            style={{
+                flex: 1,
+                flexDirection: "row",
+                gap: EdgeInsetsCON.XS,
+                borderWidth: 1,
+                borderColor: ColorFactoryCON.CARD_BORDER,
+                backgroundColor: pressed
+                    ? ColorFactoryCON.CARD_BG_LIGHT_PRESSED
+                    : ColorFactoryCON.CARD_BG_LIGHT,
+                paddingVertical: EdgeInsetsCON.MD,
+                alignItems: "center",
+                justifyContent: "center",
+            }}
+        >
+            {action.icon && (
+                <Ionicons
+                    name={action.icon as any}
+                    size={14}
+                    color={ColorFactoryCON.WHITE}
+                />
+            )}
+            <Text
+                style={{
+                    fontSize: 10,
+                    fontWeight: "700",
+                    color: ColorFactoryCON.WHITE,
+                    textTransform: "uppercase",
+                    letterSpacing: 1.5,
+                }}
+            >
+                {action.label}
+            </Text>
+        </Pressable>
+    );
 }
 
 export default function StandardBottomSheetComponent({
@@ -31,20 +94,32 @@ export default function StandardBottomSheetComponent({
     onClose,
     children,
     height = "85%",
+    rightIconType = "none",
+    onRightPress,
+    actions = [],
 }: StandardBottomSheetComponentProps): React.JSX.Element {
     const sheetTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
-
-    const animateOut = (callback: () => void): void => {
-        Animated.timing(sheetTranslateY, {
-            toValue: SCREEN_HEIGHT,
-            duration: 200,
-            useNativeDriver: false,
-        }).start(() => callback());
-    };
+    const [isExpanded, setIsExpanded] = useState<boolean>(false);
+    const [showModal, setShowModal] = useState<boolean>(visible);
 
     const handleClose = (): void => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        animateOut(onClose);
+        onClose();
+    };
+
+    const handleMorePress = (): void => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setIsExpanded((prev) => !prev);
+        if (onRightPress) {
+            onRightPress();
+        }
+    };
+
+    const handleActionPress = (actionOnPress: () => void): void => {
+        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        setIsExpanded(false);
+        actionOnPress();
     };
 
     const panResponder = useRef(
@@ -62,7 +137,7 @@ export default function StandardBottomSheetComponent({
             onPanResponderRelease: (_, gestureState) => {
                 if (gestureState.dy > 120 || gestureState.vy > 0.5) {
                     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    animateOut(onClose);
+                    onClose();
                 } else {
                     Animated.spring(sheetTranslateY, {
                         toValue: 0,
@@ -77,6 +152,8 @@ export default function StandardBottomSheetComponent({
 
     useEffect(() => {
         if (visible) {
+            setShowModal(true);
+            setIsExpanded(false);
             sheetTranslateY.setValue(SCREEN_HEIGHT);
             Animated.spring(sheetTranslateY, {
                 toValue: 0,
@@ -84,6 +161,14 @@ export default function StandardBottomSheetComponent({
                 stiffness: 200,
                 useNativeDriver: false,
             }).start();
+        } else {
+            Animated.timing(sheetTranslateY, {
+                toValue: SCREEN_HEIGHT,
+                duration: 200,
+                useNativeDriver: false,
+            }).start(() => {
+                setShowModal(false);
+            });
         }
     }, [visible, sheetTranslateY]);
 
@@ -95,7 +180,7 @@ export default function StandardBottomSheetComponent({
 
     return (
         <Modal
-            visible={visible}
+            visible={showModal}
             transparent
             animationType="none"
             onRequestClose={handleClose}
@@ -134,9 +219,8 @@ export default function StandardBottomSheetComponent({
                             left: 0,
                             right: 0,
                             zIndex: 10,
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "space-between",
+                            flexDirection: "column",
+                            alignItems: "stretch",
                             paddingHorizontal: EdgeInsetsCON.SCREEN_H,
                             paddingTop: EdgeInsetsCON.LG,
                             paddingBottom: EdgeInsetsCON.LG,
@@ -144,45 +228,94 @@ export default function StandardBottomSheetComponent({
                             borderBottomColor: ColorFactoryCON.CARD_BORDER,
                         }}
                     >
-                        {/* Close button */}
-                        <Pressable
-                            onPress={handleClose}
-                            hitSlop={{
-                                top: 12,
-                                bottom: 12,
-                                left: 12,
-                                right: 12,
-                            }}
+                        {/* Header Row */}
+                        <View
                             style={{
-                                width: 40,
-                                height: 40,
+                                flexDirection: "row",
                                 alignItems: "center",
-                                justifyContent: "center",
+                                justifyContent: "space-between",
+                                width: "100%",
                             }}
                         >
-                            <Ionicons
-                                name="close"
-                                size={24}
-                                color={ColorFactoryCON.WHITE}
-                            />
-                        </Pressable>
+                            {/* Close button */}
+                            <Pressable
+                                onPress={handleClose}
+                                hitSlop={{
+                                    top: 12,
+                                    bottom: 12,
+                                    left: 12,
+                                    right: 12,
+                                }}
+                                style={{
+                                    width: 40,
+                                    height: 40,
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                }}
+                            >
+                                <Ionicons
+                                    name="close"
+                                    size={24}
+                                    color={ColorFactoryCON.WHITE}
+                                />
+                            </Pressable>
 
-                        {/* Heading Title */}
-                        <Text
-                            style={{
-                                fontFamily: "Anton",
-                                fontSize: 24,
-                                fontWeight: "900",
-                                color: ColorFactoryCON.WHITE,
-                                textTransform: "uppercase",
-                                letterSpacing: 0.5,
-                            }}
-                        >
-                            {title}
-                        </Text>
+                            {/* Heading Title */}
+                            <Text
+                                style={{
+                                    fontFamily: "Anton",
+                                    fontSize: 24,
+                                    fontWeight: "900",
+                                    color: ColorFactoryCON.WHITE,
+                                    textTransform: "uppercase",
+                                    letterSpacing: 0.5,
+                                }}
+                            >
+                                {title}
+                            </Text>
 
-                        {/* Right Spacer to center title */}
-                        <View style={{ width: 40 }} />
+                            {/* Right Options Toggle or Spacer */}
+                            {rightIconType === "more" ? (
+                                <Pressable
+                                    onPress={handleMorePress}
+                                    hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                                    style={{
+                                        width: 40,
+                                        height: 40,
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                    }}
+                                >
+                                    <Ionicons
+                                        name={isExpanded ? "close" : "ellipsis-vertical"}
+                                        size={24}
+                                        color={ColorFactoryCON.WHITE}
+                                    />
+                                </Pressable>
+                            ) : (
+                                <View style={{ width: 40 }} />
+                            )}
+                        </View>
+
+                        {/* Expanded Actions */}
+                        {isExpanded && actions && actions.length > 0 && (
+                            <View
+                                style={{
+                                    flexDirection: "row",
+                                    gap: EdgeInsetsCON.SM,
+                                    marginTop: EdgeInsetsCON.LG,
+                                    width: "100%",
+                                }}
+                            >
+                                {actions.map((action, index) => (
+                                    <ActionButton
+                                        key={index}
+                                        action={action}
+                                        onPress={handleActionPress}
+                                    />
+                                ))}
+                            </View>
+                        )}
                     </BlurView>
 
                     {/* Scrollable Sheet Content */}
@@ -190,9 +323,8 @@ export default function StandardBottomSheetComponent({
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{
                             paddingHorizontal: EdgeInsetsCON.SCREEN_H,
-                            paddingTop: 88,
-                            paddingBottom:
-                                EdgeInsetsCON.SCROLL_BOTTOM_CLEARANCE,
+                            paddingTop: isExpanded ? 152 : 88,
+                            paddingBottom: EdgeInsetsCON.SCROLL_BOTTOM_CLEARANCE,
                         }}
                     >
                         {children}
