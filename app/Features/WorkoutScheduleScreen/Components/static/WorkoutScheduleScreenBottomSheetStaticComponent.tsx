@@ -8,9 +8,12 @@ import WorkoutListScreenCON, {
     WorkoutCard,
 } from "@/app/Features/WorkoutListScreen/Constants/WorkoutListScreenCON";
 import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import useUserCustomDataStateStore from "@/app/Store/UserCustomDataStateStore";
 import * as Haptics from "expo-haptics";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+    ActivityIndicator,
     Animated,
     Dimensions,
     Modal,
@@ -27,7 +30,7 @@ interface WorkoutScheduleScreenBottomSheetStaticComponentProps {
     visible: boolean;
     day: ScheduleDay | null;
     onClose: () => void;
-    onSelectWorkout?: (workout: WorkoutCard) => void;
+    onSelectWorkout?: (workout: WorkoutCard) => Promise<void> | void;
 }
 
 export default function WorkoutScheduleScreenBottomSheetStaticComponent({
@@ -37,6 +40,30 @@ export default function WorkoutScheduleScreenBottomSheetStaticComponent({
     onSelectWorkout,
 }: WorkoutScheduleScreenBottomSheetStaticComponentProps): React.JSX.Element {
     const sheetTranslateY = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
+    const [savingWorkoutId, setSavingWorkoutId] = useState<string | null>(null);
+
+    const customWorkouts = useUserCustomDataStateStore((state) => state.customWorkouts);
+
+    const allWorkouts = useMemo(() => {
+        const restDay: WorkoutCard = {
+            id: "REST",
+            tags: ["Rest"],
+            title: "Rest Day",
+            description: "Take some time to recover and rebuild.",
+            exercises: [],
+        };
+        const staticList = WorkoutListScreenCON.WORKOUTS;
+        const customList = customWorkouts
+            ? Object.values(customWorkouts).map((w) => ({
+                  id: w.id || "",
+                  tags: ["Custom"],
+                  title: w.name,
+                  description: w.exercises.join(", "),
+                  exercises: w.exercises.map((name) => ({ name })),
+              }))
+            : [];
+        return [restDay, ...staticList, ...customList];
+    }, [customWorkouts]);
 
     const animateOut = (callback: () => void): void => {
         Animated.timing(sheetTranslateY, {
@@ -128,9 +155,16 @@ export default function WorkoutScheduleScreenBottomSheetStaticComponent({
                     }}
                 >
                     {/* Sheet Header — styled like ApplicationStickyToolbar */}
-                    <View
+                    <BlurView
                         {...panResponder.panHandlers}
+                        intensity={50}
+                        tint="dark"
                         style={{
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            zIndex: 10,
                             flexDirection: "row",
                             alignItems: "center",
                             justifyContent: "space-between",
@@ -175,18 +209,18 @@ export default function WorkoutScheduleScreenBottomSheetStaticComponent({
 
                         {/* Right Spacer to center title */}
                         <View style={{ width: 40 }} />
-                    </View>
+                    </BlurView>
 
                     {/* Scrollable Workout Cards List */}
                     <ScrollView
                         showsVerticalScrollIndicator={false}
                         contentContainerStyle={{
                             paddingHorizontal: EdgeInsetsCON.SCREEN_H,
-                            paddingTop: EdgeInsetsCON.LG,
+                            paddingTop: 88,
                             paddingBottom: EdgeInsetsCON.SCROLL_BOTTOM_CLEARANCE,
                         }}
                     >
-                        {WorkoutListScreenCON.WORKOUTS.map((workout) => (
+                        {allWorkouts.map((workout) => (
                             <View
                                 key={workout.id}
                                 style={{
@@ -269,69 +303,98 @@ export default function WorkoutScheduleScreenBottomSheetStaticComponent({
                                 </Text>
 
                                 {/* Exercise list */}
-                                <View
-                                    style={{
-                                        borderTopWidth: 1,
-                                        borderTopColor: ColorFactoryCON.CARD_BORDER,
-                                        marginBottom: EdgeInsetsCON.LG,
-                                    }}
-                                >
-                                    {workout.exercises.map((exercise, index) => (
-                                        <View
-                                            key={exercise.name}
-                                            style={{
-                                                flexDirection: "row",
-                                                alignItems: "center",
-                                                gap: EdgeInsetsCON.MD,
-                                                paddingVertical: EdgeInsetsCON.SM,
-                                                borderBottomWidth: 1,
-                                                borderBottomColor: ColorFactoryCON.CARD_BORDER,
-                                            }}
-                                        >
-                                            <Text
+                                {workout.exercises.length > 0 && (
+                                    <View
+                                        style={{
+                                            borderTopWidth: 1,
+                                            borderTopColor: ColorFactoryCON.CARD_BORDER,
+                                            marginBottom: EdgeInsetsCON.LG,
+                                        }}
+                                    >
+                                        {workout.exercises.map((exercise, index) => (
+                                            <View
+                                                key={exercise.name}
                                                 style={{
-                                                    fontSize: 10,
-                                                    fontWeight: "700",
-                                                    color: ColorFactoryCON.MUTE,
-                                                    letterSpacing: 1,
-                                                    width: 20,
+                                                    flexDirection: "row",
+                                                    alignItems: "center",
+                                                    gap: EdgeInsetsCON.MD,
+                                                    paddingVertical: EdgeInsetsCON.SM,
+                                                    borderBottomWidth: 1,
+                                                    borderBottomColor: ColorFactoryCON.CARD_BORDER,
                                                 }}
                                             >
-                                                {String(index + 1).padStart(2, "0")}
-                                            </Text>
-                                            <Text
-                                                style={{
-                                                    fontSize: 14,
-                                                    fontWeight: "600",
-                                                    color: ColorFactoryCON.WHITE,
-                                                    flex: 1,
-                                                    letterSpacing: 0.2,
-                                                }}
-                                            >
-                                                {exercise.name}
-                                            </Text>
-                                        </View>
-                                    ))}
-                                </View>
+                                                <Text
+                                                    style={{
+                                                        fontSize: 10,
+                                                        fontWeight: "700",
+                                                        color: ColorFactoryCON.MUTE,
+                                                        letterSpacing: 1,
+                                                        width: 20,
+                                                    }}
+                                                >
+                                                    {String(index + 1).padStart(2, "0")}
+                                                </Text>
+                                                <Text
+                                                    style={{
+                                                        fontSize: 14,
+                                                        fontWeight: "600",
+                                                        color: ColorFactoryCON.WHITE,
+                                                        flex: 1,
+                                                        letterSpacing: 0.2,
+                                                    }}
+                                                >
+                                                    {exercise.name}
+                                                </Text>
+                                            </View>
+                                        ))}
+                                    </View>
+                                )}
 
                                 {/* Select CTA */}
-                                <StandardButtonComponent
-                                    label="Select"
-                                    onPress={() => {
-                                        Haptics.impactAsync(
-                                            Haptics.ImpactFeedbackStyle.Medium,
-                                        );
-                                        if (onSelectWorkout) {
-                                            onSelectWorkout(workout);
-                                        }
-                                        handleClose();
-                                    }}
-                                    variant={StandardButtonComponentVariant.WHITE}
-                                    fullWidth
-                                    borderRadius={0}
-                                    fontSize={12}
-                                    fontWeight="700"
-                                />
+                                {savingWorkoutId === workout.id ? (
+                                    <View
+                                        style={{
+                                            width: "100%",
+                                            paddingVertical: 14,
+                                            backgroundColor: ColorFactoryCON.WHITE,
+                                            borderRadius: 0,
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                        }}
+                                    >
+                                        <ActivityIndicator
+                                            color={ColorFactoryCON.INK}
+                                            size="small"
+                                        />
+                                    </View>
+                                ) : (
+                                    <StandardButtonComponent
+                                        label="Select"
+                                        onPress={async () => {
+                                            Haptics.impactAsync(
+                                                Haptics.ImpactFeedbackStyle.Medium,
+                                            );
+                                            if (onSelectWorkout) {
+                                                setSavingWorkoutId(workout.id);
+                                                try {
+                                                    await onSelectWorkout(workout);
+                                                    handleClose();
+                                                } catch (err) {
+                                                    console.error("Failed to save schedule day:", err);
+                                                } finally {
+                                                    setSavingWorkoutId(null);
+                                                }
+                                            } else {
+                                                handleClose();
+                                            }
+                                        }}
+                                        variant={StandardButtonComponentVariant.WHITE}
+                                        fullWidth
+                                        borderRadius={0}
+                                        fontSize={12}
+                                        fontWeight="700"
+                                    />
+                                )}
                             </View>
                         ))}
                     </ScrollView>

@@ -7,10 +7,11 @@ import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import WorkoutEngineScreenCON from "@/app/Features/WorkoutEngineScreen/Constants/WorkoutEngineScreenCON";
 import WorkoutListScreenCON from "@/app/Features/WorkoutListScreen/Constants/WorkoutListScreenCON";
+import useUserCustomDataStateStore from "@/app/Store/UserCustomDataStateStore";
 import DatabaseService from "@/app/Services/DatabaseService";
 import * as Haptics from "expo-haptics";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WorkoutExerciseType } from "@/app/Types/WorkoutExerciseType";
@@ -92,46 +93,63 @@ function FABButton({
     );
 }
 
-// ─── Build exercises from WorkoutListScreenCON ───────────────────────────────
-function buildExercises(workoutId: string): WorkoutExerciseType[] {
-    const workout = WorkoutListScreenCON.WORKOUTS.find(
-        (w) => w.id === workoutId,
-    );
-    if (!workout) return WorkoutEngineScreenCON.EXERCISES;
 
-    return workout.exercises.map((ex, index) => ({
-        id: String(index + 1),
-        index: index + 1,
-        category: workout.tags[0] ?? "Exercise",
-        name: ex.name,
-        sets: [
-            {
-                id: `${index + 1}-1`,
-                setNumber: 1,
-                totalSets: 1,
-                weightPlaceholder: "0",
-                repsPlaceholder: "8",
-                completed: false,
-            },
-        ],
-    }));
-}
 
 export default function WorkoutEngineScreenController(): React.JSX.Element {
     const { id } = useLocalSearchParams<{ id: string }>();
     const router = useRouter();
     const navigation = useNavigation();
 
-    const workout = WorkoutListScreenCON.WORKOUTS.find((w) => w.id === id);
+    const customWorkouts = useUserCustomDataStateStore((state) => state.customWorkouts);
+
+    const allWorkouts = useMemo(() => {
+        const staticList = WorkoutListScreenCON.WORKOUTS;
+        if (!customWorkouts) {
+            return staticList;
+        }
+        const customList = Object.values(customWorkouts).map((w) => ({
+            id: w.id || "",
+            tags: ["Custom"],
+            title: w.name,
+            description: w.exercises.join(", "),
+            exercises: w.exercises.map((name) => ({ name })),
+        }));
+        return [...staticList, ...customList];
+    }, [customWorkouts]);
+
+    const workout = useMemo(() => allWorkouts.find((w) => w.id === id), [allWorkouts, id]);
 
     const [sessionState, setSessionState] = useState<SessionState>("idle");
     const [startModalVisible, setStartModalVisible] = useState<boolean>(false);
     const [stopModalVisible, setStopModalVisible] = useState<boolean>(false);
     const [completeModalVisible, setCompleteModalVisible] = useState<boolean>(false);
     const [elapsed, setElapsed] = useState<number>(0);
-    const [exercises, setExercises] = useState<WorkoutExerciseType[]>(() =>
-        buildExercises(id ?? ""),
-    );
+
+    const initialExercises = useMemo(() => {
+        if (!workout) return WorkoutEngineScreenCON.EXERCISES;
+        return workout.exercises.map((ex, index) => ({
+            id: String(index + 1),
+            index: index + 1,
+            category: workout.tags[0] ?? "Exercise",
+            name: ex.name,
+            sets: [
+                {
+                    id: `${index + 1}-1`,
+                    setNumber: 1,
+                    totalSets: 1,
+                    weightPlaceholder: "0",
+                    repsPlaceholder: "8",
+                    completed: false,
+                },
+            ],
+        }));
+    }, [workout]);
+
+    const [exercises, setExercises] = useState<WorkoutExerciseType[]>(initialExercises);
+
+    useEffect(() => {
+        setExercises(initialExercises);
+    }, [initialExercises]);
 
     const isRunning = sessionState === "running";
 

@@ -12,7 +12,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.jettspanner123.workout-application",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSHealthShareUsageDescription": "We need access to your step count to track your physical activity daily.",
+        "NSHealthUpdateUsageDescription": "We need access to your step count to track your physical activity daily."
       }
     },
     "android": {

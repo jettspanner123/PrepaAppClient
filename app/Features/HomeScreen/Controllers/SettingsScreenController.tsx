@@ -12,21 +12,25 @@ const SETTINGS_ITEMS = [
         id: "custom-workouts",
         label: "Custom Workouts",
         target: "CUSTOM WORKOUTS",
+        icon: "clipboard-outline",
     },
     {
         id: "custom-exercises",
         label: "Custom Exercises",
         target: "CUSTOM EXERCISES",
+        icon: "barbell-outline",
     },
     {
         id: "workout-general",
         label: "Workout General",
         target: "WORKOUT GENERAL",
+        icon: "options-outline",
     },
     {
         id: "workout-schedule",
         label: "Workout Schedule",
         target: "WORKOUT SCHEDULE",
+        icon: "calendar-outline",
     },
 ];
 
@@ -37,7 +41,9 @@ export default function SettingsScreenController(): React.JSX.Element {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
         console.log("Pressed settings item:", target);
 
-        if (target === "CUSTOM WORKOUTS" || target === "CUSTOM EXERCISES") {
+        if (target === "CUSTOM WORKOUTS") {
+            router.push("/custom-workouts");
+        } else if (target === "CUSTOM EXERCISES") {
             router.push("/custom-exercises");
         } else if (target === "WORKOUT SCHEDULE") {
             router.push("/workout-schedule");
@@ -122,16 +128,29 @@ export default function SettingsScreenController(): React.JSX.Element {
                                                         : "transparent",
                                                 }}
                                             >
-                                                {/* Row label */}
-                                                <Text
+                                                {/* Left section: Icon + Label */}
+                                                <View
                                                     style={{
-                                                        fontSize: 16,
-                                                        fontWeight: "500",
-                                                        color: "#ffffff",
+                                                        flexDirection: "row",
+                                                        alignItems: "center",
+                                                        gap: EdgeInsetsCON.MD,
                                                     }}
                                                 >
-                                                    {item.label}
-                                                </Text>
+                                                    <Ionicons
+                                                        name={item.icon as any}
+                                                        size={20}
+                                                        color={ColorFactoryCON.WHITE}
+                                                    />
+                                                    <Text
+                                                        style={{
+                                                            fontSize: 16,
+                                                            fontWeight: "500",
+                                                            color: "#ffffff",
+                                                        }}
+                                                    >
+                                                        {item.label}
+                                                    </Text>
+                                                </View>
 
                                                 {/* iOS Arrow icon */}
                                                 <Ionicons
@@ -150,7 +169,7 @@ export default function SettingsScreenController(): React.JSX.Element {
                                                 height: 1,
                                                 backgroundColor:
                                                     ColorFactoryCON.CARD_BORDER,
-                                                marginLeft: 16, // inset matching the padding
+                                                marginLeft: 48, // inset matching padding + icon size + gap
                                             }}
                                         />
                                     )}

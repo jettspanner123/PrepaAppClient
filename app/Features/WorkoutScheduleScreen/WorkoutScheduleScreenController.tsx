@@ -6,54 +6,40 @@ import WorkoutScheduleScreenDayRowStaticComponent from "@/app/Features/WorkoutSc
 import WorkoutScheduleScreenCON, {
     ScheduleDay,
 } from "@/app/Features/WorkoutScheduleScreen/Constants/WorkoutScheduleScreenCON";
-import WorkoutListScreenCON, { WorkoutCard } from "@/app/Features/WorkoutListScreen/Constants/WorkoutListScreenCON";
+import { WorkoutCard } from "@/app/Features/WorkoutListScreen/Constants/WorkoutListScreenCON";
 import DatabaseService from "@/app/Services/DatabaseService";
+import useUserCustomDataStateStore from "@/app/Store/UserCustomDataStateStore";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { ScrollView } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function WorkoutScheduleScreenController(): React.JSX.Element {
     const router = useRouter();
     const [selectedDay, setSelectedDay] = useState<ScheduleDay | null>(null);
-    const [schedule, setSchedule] = useState<Record<string, string>>({});
 
-    // Load initial schedule from DB
-    useEffect(() => {
-        const fetchSchedule = async (): Promise<void> => {
-            try {
-                const data = await DatabaseService.getInstance().getSchedule();
-                if (data) {
-                    setSchedule(data);
-                }
-            } catch (error) {
-                console.error("Error loading schedule from RTDB:", error);
-            }
-        };
-        fetchSchedule();
-    }, []);
+    const scheduleFromStore = useUserCustomDataStateStore((state) => state.schedule);
+    const storeSchedule = useMemo(() => scheduleFromStore || {}, [scheduleFromStore]);
+    const setStoreSchedule = useUserCustomDataStateStore((state) => state.setSchedule);
+
 
     // Merge DB schedule with static mock DAYS configuration
     const dynamicDays = useMemo(() => {
         return WorkoutScheduleScreenCON.DAYS.map((day) => {
-            const assignedWorkoutId = schedule[day.id];
-            if (assignedWorkoutId) {
-                const workout = WorkoutListScreenCON.WORKOUTS.find(
-                    (w) => w.id === assignedWorkoutId,
-                );
-                if (workout) {
-                    return {
-                        ...day,
-                        type: "assigned" as const,
-                        label: workout.title,
-                        sublabel: workout.tags.join(" / "),
-                    };
-                }
+            const assignedWorkout = storeSchedule[day.id];
+            if (assignedWorkout) {
+                const tags = Array.isArray(assignedWorkout.tags) ? assignedWorkout.tags : ["Custom"];
+                return {
+                    ...day,
+                    type: "assigned" as const,
+                    label: assignedWorkout.title || assignedWorkout.name || "Workout",
+                    sublabel: tags.join(" / "),
+                };
             }
             return day;
         });
-    }, [schedule]);
+    }, [storeSchedule]);
 
     const handleClose = useCallback((): void => {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -77,17 +63,19 @@ export default function WorkoutScheduleScreenController(): React.JSX.Element {
                 return;
             }
 
+            const updatedSchedule = {
+                ...storeSchedule,
+                [selectedDay.id]: workout,
+            };
+
             try {
-                // Optimistically update local UI state
-                setSchedule((prev) => ({
-                    ...prev,
-                    [selectedDay.id]: workout.id,
-                }));
+                // Optimistically update Zustand store
+                setStoreSchedule(updatedSchedule);
 
                 // Save to RTDB
                 await DatabaseService.getInstance().saveScheduleDay(
                     selectedDay.id,
-                    workout.id,
+                    workout,
                 );
 
                 Haptics.notificationAsync(
@@ -99,15 +87,14 @@ export default function WorkoutScheduleScreenController(): React.JSX.Element {
                     Haptics.NotificationFeedbackType.Error,
                 );
 
-                // Rollback local state
+                // Rollback store state
                 const originalData =
                     await DatabaseService.getInstance().getSchedule();
-                if (originalData) {
-                    setSchedule(originalData);
-                }
+                setStoreSchedule(originalData);
+                throw error;
             }
         },
-        [selectedDay],
+        [selectedDay, storeSchedule, setStoreSchedule],
     );
 
     return (

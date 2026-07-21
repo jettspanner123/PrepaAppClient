@@ -2,6 +2,7 @@ import { database } from "@/app/Configurations/FirebaseConfiguration";
 import { ExerciseDataType } from "@/app/Types/ExerciseDataType";
 import { WorkoutDataType } from "@/app/Types/WorkoutDataType";
 import { WorkoutSessionDataType } from "@/app/Types/WorkoutSessionDataType";
+import { WorkoutCard } from "@/app/Features/WorkoutListScreen/Constants/WorkoutListScreenCON";
 import { get, push, ref, remove, set } from "firebase/database";
 
 export default class DatabaseService {
@@ -33,18 +34,20 @@ export default class DatabaseService {
     }
 
     /**
-     * Save a new workout to the Realtime Database
+     * Save a new workout to the Realtime Database for user jettspanner123
      * @param workout The workout details to persist
      * @returns The generated key of the new workout
      */
     public async saveWorkout(workout: WorkoutDataType): Promise<string> {
-        const workoutsRef = ref(database, "workouts");
+        const workoutsRef = ref(database, "users/jettspanner123/workouts");
         const newWorkoutRef = push(workoutsRef);
+        const workoutId = newWorkoutRef.key || "";
         await set(newWorkoutRef, {
             ...workout,
+            id: workoutId,
             createdAt: Date.now(),
         });
-        return newWorkoutRef.key || "";
+        return workoutId;
     }
 
     /**
@@ -61,11 +64,11 @@ export default class DatabaseService {
     }
 
     /**
-     * Fetch all saved workouts from the Realtime Database
+     * Fetch all saved workouts for user jettspanner123 from the Realtime Database
      * @returns Record object of workouts or null
      */
     public async getWorkouts(): Promise<Record<string, WorkoutDataType> | null> {
-        const workoutsRef = ref(database, "workouts");
+        const workoutsRef = ref(database, "users/jettspanner123/workouts");
         const snapshot = await get(workoutsRef);
         if (snapshot.exists()) {
             return snapshot.val() as Record<string, WorkoutDataType>;
@@ -86,11 +89,11 @@ export default class DatabaseService {
     }
 
     /**
-     * Delete a workout by its unique ID
+     * Delete a workout by its unique ID for user jettspanner123
      * @param workoutId Unique key of the workout
      */
     public async deleteWorkout(workoutId: string): Promise<void> {
-        const workoutRef = ref(database, `workouts/${workoutId}`);
+        const workoutRef = ref(database, `users/jettspanner123/workouts/${workoutId}`);
         await remove(workoutRef);
     }
 
@@ -119,11 +122,11 @@ export default class DatabaseService {
     /**
      * Fetch the weekly schedule for user jettspanner123 from the Realtime Database
      */
-    public async getSchedule(): Promise<Record<string, string> | null> {
+    public async getSchedule(): Promise<Record<string, WorkoutCard> | null> {
         const scheduleRef = ref(database, "users/jettspanner123/schedule");
         const snapshot = await get(scheduleRef);
         if (snapshot.exists()) {
-            return snapshot.val() as Record<string, string>;
+            return snapshot.val() as Record<string, WorkoutCard>;
         }
         return null;
     }
@@ -131,10 +134,10 @@ export default class DatabaseService {
     /**
      * Save/update the workout assignment for a specific day in user jettspanner123's schedule
      * @param dayId The ID of the day (e.g., 'mon', 'tue')
-     * @param workoutId The unique ID of the assigned workout
+     * @param workout The assigned workout object
      */
-    public async saveScheduleDay(dayId: string, workoutId: string): Promise<void> {
+    public async saveScheduleDay(dayId: string, workout: WorkoutCard): Promise<void> {
         const dayRef = ref(database, `users/jettspanner123/schedule/${dayId}`);
-        await set(dayRef, workoutId);
+        await set(dayRef, workout);
     }
 }

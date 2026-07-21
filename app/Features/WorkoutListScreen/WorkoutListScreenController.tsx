@@ -3,13 +3,31 @@ import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import WorkoutListScreenCardStaticComponent from "@/app/Features/WorkoutListScreen/Components/static/WorkoutListScreenCardStaticComponent";
 import WorkoutListScreenCON from "@/app/Features/WorkoutListScreen/Constants/WorkoutListScreenCON";
+import useUserCustomDataStateStore from "@/app/Store/UserCustomDataStateStore";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function WorkoutListScreenController(): React.JSX.Element {
     const router = useRouter();
+
+    const customWorkouts = useUserCustomDataStateStore((state) => state.customWorkouts);
+
+    const allWorkouts = useMemo(() => {
+        const staticList = WorkoutListScreenCON.WORKOUTS;
+        if (!customWorkouts) {
+            return staticList;
+        }
+        const customList = Object.values(customWorkouts).map((w) => ({
+            id: w.id || "",
+            tags: ["Custom"],
+            title: w.name,
+            description: w.exercises.join(", "),
+            exercises: w.exercises.map((name) => ({ name })),
+        }));
+        return [...staticList, ...customList];
+    }, [customWorkouts]);
 
     const handleStart = (id: string): void => {
         router.push(`/workout-engine/${id}`);
@@ -56,7 +74,7 @@ export default function WorkoutListScreenController(): React.JSX.Element {
                 </View>
 
                 {/* Workout cards */}
-                {WorkoutListScreenCON.WORKOUTS.map((workout) => (
+                {allWorkouts.map((workout) => (
                     <WorkoutListScreenCardStaticComponent
                         key={workout.id}
                         workout={workout}

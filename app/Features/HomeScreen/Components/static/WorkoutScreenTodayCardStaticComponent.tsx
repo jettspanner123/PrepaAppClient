@@ -4,12 +4,85 @@ import StandardButtonComponent, {
 import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import HomeScreenCON from "@/app/Features/HomeScreen/Constants/HomeScreenCON";
+import WorkoutScheduleScreenCON from "@/app/Features/WorkoutScheduleScreen/Constants/WorkoutScheduleScreenCON";
+import WorkoutListScreenCON, { WorkoutCard } from "@/app/Features/WorkoutListScreen/Constants/WorkoutListScreenCON";
+import useUserCustomDataStateStore from "@/app/Store/UserCustomDataStateStore";
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import { Pressable, Text, View } from "react-native";
 
 export default function WorkoutScreenTodayCardStaticComponent(): React.JSX.Element {
     const router = useRouter();
+    const scheduleFromStore = useUserCustomDataStateStore((state) => state.schedule);
+
+    // Get today's workout dynamically
+    const todayWorkout = useMemo<WorkoutCard>(() => {
+        const dayIndex = new Date().getDay(); // 0 is Sunday, 1 is Monday, etc.
+        const dayIds = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+        const todayId = dayIds[dayIndex];
+
+        // 1. Check user schedule from state store
+        if (scheduleFromStore && scheduleFromStore[todayId]) {
+            const assigned = scheduleFromStore[todayId];
+            return {
+                id: assigned.id,
+                tags: Array.isArray(assigned.tags) ? assigned.tags : ["Custom"],
+                title: assigned.title || assigned.name || "Workout",
+                description: assigned.description || "Your custom workout session.",
+                exercises: assigned.exercises || [],
+            };
+        }
+
+        // 2. Check defaults in WorkoutScheduleScreenCON.DAYS
+        const defaultDay = WorkoutScheduleScreenCON.DAYS.find((d) => d.id === todayId);
+        if (defaultDay) {
+            if (defaultDay.type === "rest" || defaultDay.label === "Rest Day") {
+                return {
+                    id: "REST",
+                    tags: ["Rest"],
+                    title: "Rest Day",
+                    description: "Take some time to recover and rebuild.",
+                    exercises: [],
+                };
+            }
+
+            // Fallback: match by name
+            const labelLower = defaultDay.label.toLowerCase();
+            let matchedWorkout = WorkoutListScreenCON.WORKOUTS.find(
+                (w) => w.title.toLowerCase().includes(labelLower) || labelLower.includes(w.id.toLowerCase())
+            );
+
+            if (!matchedWorkout) {
+                if (labelLower.includes("push") || labelLower.includes("chest")) {
+                    matchedWorkout = WorkoutListScreenCON.WORKOUTS.find((w) => w.id === "chest");
+                } else if (labelLower.includes("pull") || labelLower.includes("back")) {
+                    matchedWorkout = WorkoutListScreenCON.WORKOUTS.find((w) => w.id === "back");
+                } else if (labelLower.includes("leg")) {
+                    matchedWorkout = WorkoutListScreenCON.WORKOUTS.find((w) => w.id === "legs-strength");
+                } else if (labelLower.includes("upper") || labelLower.includes("arm") || labelLower.includes("shoulder")) {
+                    matchedWorkout = WorkoutListScreenCON.WORKOUTS.find((w) => w.id === "shoulders");
+                }
+            }
+
+            if (matchedWorkout) {
+                return matchedWorkout;
+            }
+
+            if (defaultDay.label) {
+                return {
+                    id: defaultDay.id,
+                    tags: [defaultDay.sublabel || "Scheduled"],
+                    title: defaultDay.label,
+                    description: "Your scheduled workout session.",
+                    exercises: [],
+                };
+            }
+        }
+
+        // 3. Absolute fallback
+        return WorkoutListScreenCON.WORKOUTS[0];
+    }, [scheduleFromStore]);
 
     const handleViewAll = (): void => {
         router.push("/workout-list");
@@ -17,6 +90,13 @@ export default function WorkoutScreenTodayCardStaticComponent(): React.JSX.Eleme
 
     const handleCreateWorkout = (): void => {
         router.push("/create-workout");
+    };
+
+    const handleStartWorkout = (): void => {
+        if (todayWorkout && todayWorkout.id !== "REST") {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            router.push(`/workout-engine/${todayWorkout.id}`);
+        }
     };
 
     return (
@@ -84,7 +164,7 @@ export default function WorkoutScreenTodayCardStaticComponent(): React.JSX.Eleme
                         marginBottom: EdgeInsetsCON.XS,
                     }}
                 >
-                    {HomeScreenCON.WORKOUT_TODAY_TAGS.map((tag, index) => (
+                    {todayWorkout.tags.map((tag, index) => (
                         <View
                             key={tag}
                             style={{
@@ -131,7 +211,7 @@ export default function WorkoutScreenTodayCardStaticComponent(): React.JSX.Eleme
                         marginBottom: EdgeInsetsCON.XS,
                     }}
                 >
-                    {HomeScreenCON.WORKOUT_TODAY_TITLE}
+                    {todayWorkout.title}
                 </Text>
 
                 {/* Description */}
@@ -144,19 +224,44 @@ export default function WorkoutScreenTodayCardStaticComponent(): React.JSX.Eleme
                         marginBottom: EdgeInsetsCON.XL,
                     }}
                 >
-                    {HomeScreenCON.WORKOUT_TODAY_DESCRIPTION}
+                    {todayWorkout.description}
                 </Text>
 
                 {/* CTA — sharp cornered */}
-                <StandardButtonComponent
-                    label={HomeScreenCON.WORKOUT_START_CTA}
-                    onPress={() => {}}
-                    variant={StandardButtonComponentVariant.WHITE}
-                    fullWidth
-                    borderRadius={0}
-                    fontSize={12}
-                    fontWeight="700"
-                />
+                {todayWorkout.id === "REST" ? (
+                    <View
+                        style={{
+                            paddingVertical: EdgeInsetsCON.MD,
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderWidth: 1,
+                            borderColor: ColorFactoryCON.CARD_BORDER,
+                            backgroundColor: "transparent",
+                        }}
+                    >
+                        <Text
+                            style={{
+                                fontSize: 11,
+                                fontWeight: "700",
+                                color: ColorFactoryCON.MUTE,
+                                textTransform: "uppercase",
+                                letterSpacing: 2,
+                            }}
+                        >
+                            RESTING TODAY
+                        </Text>
+                    </View>
+                ) : (
+                    <StandardButtonComponent
+                        label={HomeScreenCON.WORKOUT_START_CTA}
+                        onPress={handleStartWorkout}
+                        variant={StandardButtonComponentVariant.WHITE}
+                        fullWidth
+                        borderRadius={0}
+                        fontSize={12}
+                        fontWeight="700"
+                    />
+                )}
             </View>
 
             {/* Crave Something Else section */}

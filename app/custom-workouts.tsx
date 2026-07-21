@@ -1,0 +1,3 @@
+import CustomWorkoutsViewScreenController from "@/app/Features/CustomWorkoutsViewScreen/CustomWorkoutsViewScreenController";
+
+export default CustomWorkoutsViewScreenController;

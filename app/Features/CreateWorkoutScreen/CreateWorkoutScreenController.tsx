@@ -8,6 +8,9 @@ import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import ExerciseLibraryCON from "@/app/Constants/ExerciseLibraryCON";
 import CreateWorkoutScreenCON from "@/app/Features/CreateWorkoutScreen/Constants/CreateWorkoutScreenCON";
 import useUserCustomDataStateStore from "@/app/Store/UserCustomDataStateStore";
+import { WorkoutDataType } from "@/app/Types/WorkoutDataType";
+import { WorkoutCard } from "@/app/Features/WorkoutListScreen/Constants/WorkoutListScreenCON";
+import DatabaseService from "@/app/Services/DatabaseService";
 import { BlurView } from "expo-blur";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
@@ -139,9 +142,79 @@ export default function CreateWorkoutScreenController(): React.JSX.Element {
         });
     };
 
-    const handleSave = (): void => {
-        console.log("Saving workout:", workoutName, Array.from(selectedIds));
-        // TODO: persist
+    const handleSave = async (): Promise<void> => {
+        if (isSaveDisabled) return;
+
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+        const exerciseNames = Array.from(selectedIds).map((id) => {
+            const ex = allExercises.find((e) => e.id === id);
+            return ex ? ex.name : id;
+        });
+
+        const newWorkout: WorkoutDataType = {
+            name: workoutName,
+            weekDay: selectedWeekDay,
+            exercises: exerciseNames,
+        };
+
+        try {
+            const generatedId =
+                await DatabaseService.getInstance().saveWorkout(newWorkout);
+
+            const currentCustom =
+                useUserCustomDataStateStore.getState().customWorkouts || {};
+            const updatedCustom = {
+                ...currentCustom,
+                [generatedId]: {
+                    ...newWorkout,
+                    id: generatedId,
+                },
+            };
+            useUserCustomDataStateStore.getState().setCustomWorkouts(
+                updatedCustom,
+            );
+
+            if (selectedWeekDay) {
+                const daysMap: Record<string, string> = {
+                    Monday: "mon",
+                    Tuesday: "tue",
+                    Wednesday: "wed",
+                    Thursday: "thu",
+                    Friday: "fri",
+                    Saturday: "sat",
+                    Sunday: "sun",
+                };
+                const dayId = daysMap[selectedWeekDay];
+                if (dayId) {
+                    const workoutCard: WorkoutCard = {
+                        id: generatedId,
+                        tags: ["Custom"],
+                        title: newWorkout.name,
+                        description: newWorkout.exercises.join(", "),
+                        exercises: newWorkout.exercises.map((name) => ({ name })),
+                    };
+                    await DatabaseService.getInstance().saveScheduleDay(
+                        dayId,
+                        workoutCard,
+                    );
+                    const currentSchedule =
+                        useUserCustomDataStateStore.getState().schedule || {};
+                    useUserCustomDataStateStore.getState().setSchedule({
+                        ...currentSchedule,
+                        [dayId]: workoutCard,
+                    });
+                }
+            }
+
+            setWorkoutName("");
+            setSelectedWeekDay(null);
+            setSelectedIds(new Set());
+
+            router.back();
+        } catch (error) {
+            console.error("Error saving workout to database:", error);
+        }
     };
 
     const isSaveDisabled = !workoutName.trim() || selectedIds.size === 0;

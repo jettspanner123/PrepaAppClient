@@ -2,12 +2,38 @@ import StandardPageHeaderComponent from "@/app/Components/Shared/StandardPageHea
 import ColorFactoryCON from "@/app/Constants/ColorFactoryCON";
 import EdgeInsetsCON from "@/app/Constants/EdgeInsetsCON";
 import HomeScreenCON from "@/app/Features/HomeScreen/Constants/HomeScreenCON";
-import React from "react";
+import AppleHealthKitService from "@/app/Services/AppleHealthKitService";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useMemo, useState } from "react";
 import { ScrollView, Text, View } from "react-native";
 import WorkoutScreenStatTileStaticComponent from "../Components/static/WorkoutScreenStatTileStaticComponent";
 import WorkoutScreenTodayCardStaticComponent from "../Components/static/WorkoutScreenTodayCardStaticComponent";
 
 export default function WorkoutScreenController(): React.JSX.Element {
+    const [steps, setSteps] = useState<number | null>(null);
+
+    // Refresh steps on focus
+    useFocusEffect(
+        useCallback(() => {
+            let isMounted = true;
+            AppleHealthKitService.current.getStepsToday().then((stepsValue) => {
+                if (isMounted) {
+                    setSteps(stepsValue);
+                }
+            });
+            return () => {
+                isMounted = false;
+            };
+        }, [])
+    );
+
+    const formattedSteps = useMemo(() => {
+        if (steps === null) {
+            return HomeScreenCON.STAT_STEPS_VALUE;
+        }
+        return steps.toLocaleString();
+    }, [steps]);
+
     return (
         <ScrollView
             style={{ flex: 1, backgroundColor: ColorFactoryCON.BLACK }}
@@ -40,7 +66,7 @@ export default function WorkoutScreenController(): React.JSX.Element {
             >
                 <WorkoutScreenStatTileStaticComponent
                     label={HomeScreenCON.STAT_STEPS_LABEL}
-                    value={HomeScreenCON.STAT_STEPS_VALUE}
+                    value={formattedSteps}
                     unit={HomeScreenCON.STAT_STEPS_UNIT}
                 />
                 <WorkoutScreenStatTileStaticComponent
