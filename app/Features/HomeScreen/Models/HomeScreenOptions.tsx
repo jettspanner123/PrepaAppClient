@@ -1,5 +1,5 @@
 enum HomeScreenOptions {
-    RANKS,
+    JOURNAL,
     WORKOUT,
     DIET,
     STATISTICS,

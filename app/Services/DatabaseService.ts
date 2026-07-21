@@ -132,6 +132,18 @@ export default class DatabaseService {
     }
 
     /**
+     * Fetch all completed workout sessions for user jettspanner123 from the Realtime Database
+     */
+    public async getWorkoutSessions(): Promise<Record<string, WorkoutSessionDataType> | null> {
+        const sessionsRef = ref(database, "users/jettspanner123/sessions");
+        const snapshot = await get(sessionsRef);
+        if (snapshot.exists()) {
+            return snapshot.val() as Record<string, WorkoutSessionDataType>;
+        }
+        return null;
+    }
+
+    /**
      * Save/update the workout assignment for a specific day in user jettspanner123's schedule
      * @param dayId The ID of the day (e.g., 'mon', 'tue')
      * @param workout The assigned workout object

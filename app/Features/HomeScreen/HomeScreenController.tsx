@@ -11,12 +11,12 @@ import DietScreenController from "./Controllers/DietScreenController";
 import SettingsScreenController from "./Controllers/SettingsScreenController";
 import StatisticsScreenController from "./Controllers/StatisticsScreenController";
 import WorkoutScreenController from "./Controllers/WorkoutScreenController";
-import RanksScreenController from "./Controllers/RanksScreenController";
+import JournalScreenController from "./Controllers/JournalScreenController";
 import HomeScreenOptions from "./Models/HomeScreenOptions";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const TABS = [
-    HomeScreenOptions.RANKS,
+    HomeScreenOptions.JOURNAL,
     HomeScreenOptions.WORKOUT,
     HomeScreenOptions.DIET,
     HomeScreenOptions.STATISTICS,
@@ -25,9 +25,9 @@ const TABS = [
 
 const NAV_ITEMS: NavigationBarItem[] = [
     {
-        key: HomeScreenOptions.RANKS,
-        label: "Ranks",
-        icon: NavIcons.ranks,
+        key: HomeScreenOptions.JOURNAL,
+        label: "Journal",
+        icon: NavIcons.journal,
     },
     {
         key: HomeScreenOptions.WORKOUT,
@@ -87,8 +87,8 @@ export default function HomeScreenController(): React.JSX.Element {
                             flex: 1,
                         }}
                     >
-                        {tab === HomeScreenOptions.RANKS && (
-                            <RanksScreenController />
+                        {tab === HomeScreenOptions.JOURNAL && (
+                            <JournalScreenController />
                         )}
                         {tab === HomeScreenOptions.WORKOUT && (
                             <WorkoutScreenController />

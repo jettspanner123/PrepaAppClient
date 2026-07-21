@@ -21,12 +21,6 @@ const SETTINGS_ITEMS = [
         icon: "barbell-outline",
     },
     {
-        id: "workout-general",
-        label: "Workout General",
-        target: "WORKOUT GENERAL",
-        icon: "options-outline",
-    },
-    {
         id: "workout-schedule",
         label: "Workout Schedule",
         target: "WORKOUT SCHEDULE",

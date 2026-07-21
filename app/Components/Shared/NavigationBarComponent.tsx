@@ -80,8 +80,8 @@ export default function NavigationBarComponent({
     currentKey,
     onPress,
 }: NavigationBarComponentProps): React.JSX.Element {
-    const ranksItem = items.find((item) => item.label.toLowerCase() === "ranks");
-    const mainItems = items.filter((item) => item.label.toLowerCase() !== "ranks");
+    const journalItem = items.find((item) => item.label.toLowerCase() === "journal");
+    const mainItems = items.filter((item) => item.label.toLowerCase() !== "journal");
 
     return (
         <View
@@ -97,7 +97,7 @@ export default function NavigationBarComponent({
             }}
             pointerEvents="box-none"
         >
-            {ranksItem && (
+            {journalItem && (
                 <BlurView
                     intensity={60}
                     tint="dark"
@@ -114,9 +114,9 @@ export default function NavigationBarComponent({
                     }}
                 >
                     <TabItem
-                        item={ranksItem}
-                        isActive={currentKey === ranksItem.key}
-                        onPress={() => onPress(ranksItem.key)}
+                        item={journalItem}
+                        isActive={currentKey === journalItem.key}
+                        onPress={() => onPress(journalItem.key)}
                     />
                 </BlurView>
             )}
@@ -153,9 +153,9 @@ export default function NavigationBarComponent({
 
 // ─── Preset icon helpers ──────────────────────────────────────────────────────
 export const NavIcons = {
-    ranks: (active: boolean) => (
+    journal: (active: boolean) => (
         <Ionicons
-            name="trophy-outline"
+            name="book-outline"
             size={20}
             color={active ? ColorFactoryCON.INK : ColorFactoryCON.MUTE}
         />

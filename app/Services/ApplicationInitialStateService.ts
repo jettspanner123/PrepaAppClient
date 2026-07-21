@@ -1,5 +1,6 @@
 import useUserCustomDataStateStore from "@/app/Store/UserCustomDataStateStore";
 import DatabaseService from "./DatabaseService";
+import DatabaseSeederService from "./DatabaseSeederService";
 
 export default class ApplicationInitialStateService {
     private constructor() {}
@@ -14,6 +15,10 @@ export default class ApplicationInitialStateService {
             console.log(
                 "Loading splash screen data: fetching custom exercises, workouts, and schedule...",
             );
+
+            // Seed example sessions if the history is empty
+            await DatabaseSeederService.current.seedIfEmpty();
+
             const exercisesData = await DatabaseService.getInstance().getExercises();
             const workoutsData = await DatabaseService.getInstance().getWorkouts();
             const scheduleData = await DatabaseService.getInstance().getSchedule();
